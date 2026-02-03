@@ -1,7 +1,3 @@
--- Extensions: enable uuid-ossp extension
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
-
 -- Tables: create organizations table
 CREATE TABLE organizations (
     id          UUID            PRIMARY KEY DEFAULT uuid_generate_v4(),
