@@ -1,10 +1,15 @@
 import "dotenv/config";
-import express from "express";
+
+// Libraries
 import cors from "cors";
+import express from "express";
 import helmet from "helmet";
 import pino from "pino";
-import { sessionMiddleware } from "./middleware/session.middleware.js";
+
+// Local
+import { env } from "./config/env.js";
 import { errorHandler } from "./middleware/error.middleware.js";
+import { sessionMiddleware } from "./middleware/session.middleware.js";
 
 const logger = pino({
   transport: {
@@ -14,13 +19,12 @@ const logger = pino({
 });
 
 const app = express();
-const PORT = process.env.PORT ?? 3000;
 
 // Security middleware
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN ?? "http://localhost:5173",
+    origin: env.CORS_ORIGIN,
     credentials: true,
   }),
 );
@@ -41,8 +45,8 @@ app.get("/health", (_req, res) => {
 app.use(errorHandler);
 
 // Start server
-app.listen(PORT, () => {
-  logger.info(`Server running on http://localhost:${PORT}`);
+app.listen(env.PORT, () => {
+  logger.info(`Server running on http://localhost:${env.PORT}`);
 });
 
 export { app };

@@ -1,11 +1,11 @@
+// Libraries
 import pg from "pg";
 
-const DATABASE_URL =
-  process.env.DATABASE_URL ??
-  "postgres://postgres:postgres@localhost:5432/taskflow";
+// Local
+import { env } from "./env.js";
 
 export const pool = new pg.Pool({
-  connectionString: DATABASE_URL,
+  connectionString: env.DATABASE_URL,
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 5000,

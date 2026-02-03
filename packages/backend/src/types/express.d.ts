@@ -1,3 +1,4 @@
+// Local
 import type { RequestUser, RequestMembership } from "./index.js";
 
 declare global {

@@ -1,23 +1,22 @@
-import session from "express-session";
+// Libraries
 import RedisStore from "connect-redis";
-import { redis } from "./redis.js";
+import session from "express-session";
 
-const SESSION_SECRET =
-  process.env.SESSION_SECRET ?? "dev-secret-change-in-production";
-const SESSION_MAX_AGE = parseInt(process.env.SESSION_MAX_AGE ?? "86400000", 10);
-const IS_PRODUCTION = process.env.NODE_ENV === "production";
+// Local
+import { env } from "./env.js";
+import { redis } from "./redis.js";
 
 export const sessionMiddleware = session({
   store: new RedisStore({ client: redis }),
-  secret: SESSION_SECRET,
+  secret: env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   name: "sid",
   cookie: {
     httpOnly: true,
-    secure: IS_PRODUCTION,
+    secure: env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: SESSION_MAX_AGE,
+    maxAge: env.SESSION_MAX_AGE,
   },
 });
 

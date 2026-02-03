@@ -1,8 +1,10 @@
+// Libraries
 import Redis from "ioredis";
 
-const REDIS_URL = process.env.REDIS_URL ?? "redis://localhost:6379";
+// Local
+import { env } from "./env.js";
 
-export const redis = new Redis(REDIS_URL, {
+export const redis = new Redis(env.REDIS_URL, {
   maxRetriesPerRequest: 3,
   retryStrategy: (times) => {
     if (times > 3) return null;

@@ -1,4 +1,7 @@
+// Libraries
 import type { Request, Response, NextFunction } from "express";
+
+// Local
 import { pool } from "../config/db.js";
 import { ForbiddenError } from "../utils/errors.js";
 import type { MemberRole, RequestMembership } from "../types/index.js";

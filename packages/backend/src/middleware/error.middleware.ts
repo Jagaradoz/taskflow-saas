@@ -1,11 +1,15 @@
+// Libraries
 import type {
+  ErrorRequestHandler,
+  NextFunction,
   Request,
   Response,
-  NextFunction,
-  ErrorRequestHandler,
 } from "express";
-import { AppError, ValidationError } from "../utils/errors.js";
 import pino from "pino";
+
+// Local
+import { env } from "../config/env.js";
+import { AppError, ValidationError } from "../utils/errors.js";
 
 const logger = pino({
   transport: {
@@ -46,9 +50,7 @@ export const errorHandler: ErrorRequestHandler = (
   });
 
   const message =
-    process.env.NODE_ENV === "production"
-      ? "Internal server error"
-      : err.message;
+    env.NODE_ENV === "production" ? "Internal server error" : err.message;
 
   res.status(500).json({
     status: "error",
