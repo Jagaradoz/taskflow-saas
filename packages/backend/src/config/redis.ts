@@ -1,0 +1,21 @@
+// Libraries
+import Redis from "ioredis";
+
+// Local
+import { env } from "./env.js";
+
+export const redis = new Redis(env.REDIS_URL, {
+  maxRetriesPerRequest: 3,
+  retryStrategy: (times) => {
+    if (times > 3) return null;
+    return Math.min(times * 100, 2000);
+  },
+});
+
+redis.on("error", (err) => {
+  console.error("Redis connection error:", err.message);
+});
+
+redis.on("connect", () => {
+  console.log("Redis connected");
+});
