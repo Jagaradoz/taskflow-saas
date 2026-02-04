@@ -17,6 +17,7 @@ import { authRoutes } from "./routes/auth-routes.js";
 import { memberRoutes } from "./routes/member-routes.js";
 import { orgRoutes } from "./routes/org-routes.js";
 import { systemRoutes } from "./routes/system-routes.js";
+import { taskRoutes } from "./routes/task-routes.js";
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/orgs", orgRoutes);
 app.use("/api/members", memberRoutes);
 app.use("/api/system", systemRoutes);
+app.use("/api/tasks", taskRoutes);
 
 app.use(errorHandler);
 

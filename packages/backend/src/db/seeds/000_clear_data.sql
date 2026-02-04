@@ -1,2 +1,2 @@
 -- Data: clear old data
-TRUNCATE memberships, users, organizations RESTART IDENTITY CASCADE;
+TRUNCATE tasks, memberships, users, organizations RESTART IDENTITY CASCADE;

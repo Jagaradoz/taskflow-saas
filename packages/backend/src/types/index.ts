@@ -33,3 +33,14 @@ export interface RequestMembership {
   id: string;
   role: MemberRole;
 }
+
+export interface Task {
+  id: string;
+  orgId: string;
+  createdBy: string | null;
+  title: string;
+  isDone: boolean;
+  isPinned: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}

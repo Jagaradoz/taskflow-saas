@@ -69,12 +69,14 @@ class CacheService {
 export const cacheKeys = {
   user: (userId: string) => `user:${userId}`,
   members: (orgId: string) => `members:${orgId}`,
+  tasks: (orgId: string) => `tasks:${orgId}`,
 };
 
 // TTL constants (in seconds)
 export const cacheTTL = {
   user: 300, // 5 minutes
   members: 300, // 5 minutes
+  tasks: 300, // 5 minutes
 };
 
 export const cacheService = new CacheService(redis);
