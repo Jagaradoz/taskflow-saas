@@ -1,20 +1,13 @@
-// Libraries
 import { Router } from "express";
-
-// Local
-import { memberController } from "../controllers/member-controller.js";
+import * as memberController from "../controllers/member-controller.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 import { requireTenant } from "../middleware/tenant.middleware.js";
 import { authorize } from "../middleware/authorize.middleware.js";
 
 const router = Router();
 
-// All member routes require authentication and tenant context
-
 // List members (any member can view)
-router.get("/", authenticate, requireTenant, (req, res) =>
-  memberController.list(req, res),
-);
+router.get("/", authenticate, requireTenant, memberController.list);
 
 // Update member role (owner only)
 router.patch(
@@ -22,7 +15,7 @@ router.patch(
   authenticate,
   requireTenant,
   authorize("owner"),
-  (req, res) => memberController.update(req, res),
+  memberController.update,
 );
 
 // Remove member (owner only)
@@ -31,7 +24,7 @@ router.delete(
   authenticate,
   requireTenant,
   authorize("owner"),
-  (req, res) => memberController.remove(req, res),
+  memberController.remove,
 );
 
 export { router as memberRoutes };

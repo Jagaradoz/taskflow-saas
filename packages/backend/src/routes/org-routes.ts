@@ -1,8 +1,5 @@
-// Libraries
 import { Router } from "express";
-
-// Local
-import { orgController } from "../controllers/org-controller.js";
+import * as orgController from "../controllers/org-controller.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 import { requireTenant } from "../middleware/tenant.middleware.js";
 import { authorize } from "../middleware/authorize.middleware.js";
@@ -10,10 +7,10 @@ import { authorize } from "../middleware/authorize.middleware.js";
 const router = Router();
 
 // Create org (authenticated, no tenant required - creates new org)
-router.post("/", authenticate, (req, res) => orgController.create(req, res));
+router.post("/", authenticate, orgController.create);
 
 // Get org (authenticated + member of org)
-router.get("/:id", authenticate, (req, res) => orgController.getById(req, res));
+router.get("/:id", authenticate, orgController.getById);
 
 // Update org (authenticated + tenant + owner only)
 router.patch(
@@ -21,12 +18,10 @@ router.patch(
   authenticate,
   requireTenant,
   authorize("owner"),
-  (req, res) => orgController.update(req, res),
+  orgController.update,
 );
 
 // Switch active org (authenticated only)
-router.post("/:id/switch", authenticate, (req, res) =>
-  orgController.switch(req, res),
-);
+router.post("/:id/switch", authenticate, orgController.switchOrg);
 
 export { router as orgRoutes };

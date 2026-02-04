@@ -4,10 +4,10 @@ import "dotenv/config";
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
-import pino from "pino";
 
 // Local
 import { env } from "./config/env.js";
+import { logger } from "./config/logger.js";
 import { errorHandler } from "./middleware/error.middleware.js";
 import { sessionMiddleware } from "./middleware/session.middleware.js";
 
@@ -16,20 +16,6 @@ import { authRoutes } from "./routes/auth-routes.js";
 import { memberRoutes } from "./routes/member-routes.js";
 import { orgRoutes } from "./routes/org-routes.js";
 import { systemRoutes } from "./routes/system-routes.js";
-
-export const logger = pino({
-  level: env.NODE_ENV === "production" ? "info" : "debug",
-  transport:
-    env.NODE_ENV !== "production"
-      ? {
-          target: "pino-pretty",
-          options: {
-            colorize: true,
-            translateTime: "SYS:standard",
-          },
-        }
-      : undefined,
-});
 
 const app = express();
 
@@ -47,7 +33,7 @@ app.use(
 // Middlewares
 app.use(sessionMiddleware);
 
-// API routes
+// Endpoints
 app.use("/api/auth", authRoutes);
 app.use("/api/orgs", orgRoutes);
 app.use("/api/members", memberRoutes);

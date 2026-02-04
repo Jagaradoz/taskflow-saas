@@ -1,111 +1,106 @@
-// Libraries
 import type { Request, Response } from "express";
-
-// Local
-import { BaseController } from "./base-controller.js";
 import { orgService } from "../services/org-service.js";
 import { createOrgSchema, updateOrgSchema } from "../validators/org.schema.js";
 import { ValidationError } from "../utils/errors.js";
+import { sendSuccess, sendError } from "../utils/response.js";
 import "../types/express.js";
 
-class OrgController extends BaseController {
-  async create(req: Request, res: Response): Promise<void> {
-    try {
-      const userId = req.user?.id;
-      if (!userId) {
-        throw new ValidationError("User not found in session");
-      }
-
-      const parseResult = createOrgSchema.safeParse(req.body);
-      if (!parseResult.success) {
-        throw new ValidationError(
-          "Validation failed",
-          parseResult.error.errors.map((e) => ({
-            field: e.path.join("."),
-            message: e.message,
-          })),
-        );
-      }
-
-      const org = await orgService.createOrg(userId, parseResult.data);
-
-      // Automatically switch to the new org
-      req.session.currentOrgId = org.id;
-
-      this.handleSuccess(res, { organization: org }, 201);
-    } catch (error) {
-      this.handleError(error, res, "create");
+export async function create(req: Request, res: Response): Promise<void> {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      throw new ValidationError("User not found in session");
     }
-  }
 
-  async getById(req: Request, res: Response): Promise<void> {
-    try {
-      const userId = req.user?.id;
-      if (!userId) {
-        throw new ValidationError("User not found in session");
-      }
-
-      const orgId = req.params.id;
-      if (!orgId) {
-        throw new ValidationError("Organization ID is required");
-      }
-      const org = await orgService.getOrgById(orgId, userId);
-
-      this.handleSuccess(res, { organization: org });
-    } catch (error) {
-      this.handleError(error, res, "getById");
+    const parseResult = createOrgSchema.safeParse(req.body);
+    if (!parseResult.success) {
+      throw new ValidationError(
+        "Validation failed",
+        parseResult.error.errors.map((e) => ({
+          field: e.path.join("."),
+          message: e.message,
+        })),
+      );
     }
-  }
 
-  async update(req: Request, res: Response): Promise<void> {
-    try {
-      const orgId = req.params.id;
-      if (!orgId) {
-        throw new ValidationError("Organization ID is required");
-      }
+    const org = await orgService.createOrg(userId, parseResult.data);
 
-      const parseResult = updateOrgSchema.safeParse(req.body);
-      if (!parseResult.success) {
-        throw new ValidationError(
-          "Validation failed",
-          parseResult.error.errors.map((e) => ({
-            field: e.path.join("."),
-            message: e.message,
-          })),
-        );
-      }
+    // Automatically switch to the new org
+    req.session.currentOrgId = org.id;
 
-      const org = await orgService.updateOrg(orgId, parseResult.data);
-
-      this.handleSuccess(res, { organization: org });
-    } catch (error) {
-      this.handleError(error, res, "update");
-    }
-  }
-
-  async switch(req: Request, res: Response): Promise<void> {
-    try {
-      const userId = req.user?.id;
-      if (!userId) {
-        throw new ValidationError("User not found in session");
-      }
-
-      const orgId = req.params.id;
-      if (!orgId) {
-        throw new ValidationError("Organization ID is required");
-      }
-      const org = await orgService.switchOrg(userId, orgId);
-
-      req.session.currentOrgId = org.id;
-
-      this.handleSuccess(res, {
-        organization: org,
-        message: "Switched organization",
-      });
-    } catch (error) {
-      this.handleError(error, res, "switch");
-    }
+    sendSuccess(res, { organization: org }, 201);
+  } catch (error) {
+    sendError(error, res, "create");
   }
 }
 
-export const orgController = new OrgController();
+export async function getById(req: Request, res: Response): Promise<void> {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      throw new ValidationError("User not found in session");
+    }
+
+    const orgId = req.params.id;
+    if (!orgId) {
+      throw new ValidationError("Organization ID is required");
+    }
+
+    const org = await orgService.getOrgById(orgId, userId);
+
+    sendSuccess(res, { organization: org });
+  } catch (error) {
+    sendError(error, res, "getById");
+  }
+}
+
+export async function update(req: Request, res: Response): Promise<void> {
+  try {
+    const orgId = req.params.id;
+    if (!orgId) {
+      throw new ValidationError("Organization ID is required");
+    }
+
+    const parseResult = updateOrgSchema.safeParse(req.body);
+    if (!parseResult.success) {
+      throw new ValidationError(
+        "Validation failed",
+        parseResult.error.errors.map((e) => ({
+          field: e.path.join("."),
+          message: e.message,
+        })),
+      );
+    }
+
+    const org = await orgService.updateOrg(orgId, parseResult.data);
+
+    sendSuccess(res, { organization: org });
+  } catch (error) {
+    sendError(error, res, "update");
+  }
+}
+
+export async function switchOrg(req: Request, res: Response): Promise<void> {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      throw new ValidationError("User not found in session");
+    }
+
+    const orgId = req.params.id;
+    if (!orgId) {
+      throw new ValidationError("Organization ID is required");
+    }
+
+    const org = await orgService.switchOrg(userId, orgId);
+
+    req.session.currentOrgId = org.id;
+
+    sendSuccess(res, {
+      organization: org,
+      message: "Switched organization",
+    });
+  } catch (error) {
+    sendError(error, res, "switch");
+  }
+}
