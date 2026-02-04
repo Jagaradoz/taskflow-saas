@@ -5,7 +5,7 @@ import type { User, MemberRole } from "../types/index.js";
 interface UserRow {
   id: string;
   email: string;
-  password_hash: string;
+  password: string;
   name: string;
   created_at: Date;
 }
@@ -33,7 +33,7 @@ export const userRepository = {
     email: string,
   ): Promise<(User & { passwordHash: string }) | null> {
     const result = await pool.query<UserRow>(
-      "SELECT id, email, password_hash, name, created_at FROM users WHERE email = $1",
+      "SELECT id, email, password, name, created_at FROM users WHERE email = $1",
       [email],
     );
 
@@ -43,7 +43,7 @@ export const userRepository = {
     return {
       id: row.id,
       email: row.email,
-      passwordHash: row.password_hash,
+      passwordHash: row.password,
       name: row.name,
       createdAt: row.created_at,
     };
@@ -72,7 +72,7 @@ export const userRepository = {
     name: string;
   }): Promise<User> {
     const result = await pool.query<UserRow>(
-      `INSERT INTO users (email, password_hash, name)
+      `INSERT INTO users (email, password, name)
        VALUES ($1, $2, $3)
        RETURNING id, email, name, created_at`,
       [data.email, data.passwordHash, data.name],

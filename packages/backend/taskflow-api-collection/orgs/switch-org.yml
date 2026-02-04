@@ -1,0 +1,20 @@
+info:
+  name: switch-org
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: http://localhost:5000/api/orgs/c7cb786b-f27c-451e-b417-008799df11a5/switch
+  auth: inherit
+
+runtime:
+  variables:
+    - name: id
+      value: c7cb786b-f27c-451e-b417-008799df11a5
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

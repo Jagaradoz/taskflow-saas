@@ -1,0 +1,21 @@
+info:
+  name: update-org
+  type: http
+  seq: 3
+
+http:
+  method: PATCH
+  url: http://localhost:5000/api/orgs/c7cb786b-f27c-451e-b417-008799df11a5
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Updated Organization Name"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

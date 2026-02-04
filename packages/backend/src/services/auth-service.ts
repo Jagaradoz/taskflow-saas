@@ -1,10 +1,12 @@
 // Libraries
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 // Local
 import { userRepository } from "../repositories/user-repository.js";
 import { ValidationError, UnauthorizedError } from "../utils/errors.js";
 import { cacheService, cacheKeys, cacheTTL } from "./cache-service.js";
+
+// Types
 import type { RegisterInput, LoginInput } from "../validators/auth.schema.js";
 
 const SALT_ROUNDS = 12;

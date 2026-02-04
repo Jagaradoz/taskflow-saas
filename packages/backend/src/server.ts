@@ -8,6 +8,7 @@ import helmet from "helmet";
 // Local
 import { env } from "./config/env.js";
 import { logger } from "./config/logger.js";
+import { pool } from "./config/db.js";
 import { errorHandler } from "./middleware/error.middleware.js";
 import { sessionMiddleware } from "./middleware/session.middleware.js";
 
@@ -41,8 +42,9 @@ app.use("/api/system", systemRoutes);
 
 app.use(errorHandler);
 
-app.listen(env.PORT, () => {
-  logger.info(`Server running on http://localhost:${env.PORT}`);
+app.listen(env.PORT, async () => {
+  logger.info("Server connected (PORT: %d)", env.PORT);
+  await pool.query("SELECT 1");
 });
 
 export { app };
