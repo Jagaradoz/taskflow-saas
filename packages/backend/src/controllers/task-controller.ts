@@ -8,6 +8,8 @@ import { ValidationError } from "../utils/errors.js";
 import { sendSuccess, sendError } from "../utils/response.js";
 import "../types/express.js";
 
+// @route GET /api/tasks
+// @desc  List tasks (any member can view)
 export async function list(req: Request, res: Response): Promise<void> {
   try {
     const orgId = req.currentOrgId;
@@ -23,6 +25,8 @@ export async function list(req: Request, res: Response): Promise<void> {
   }
 }
 
+// @route POST /api/tasks
+// @desc  Create task (any member can create)
 export async function create(req: Request, res: Response): Promise<void> {
   try {
     const orgId = req.currentOrgId;
@@ -58,6 +62,8 @@ export async function create(req: Request, res: Response): Promise<void> {
   }
 }
 
+// @route PATCH /api/tasks/:id
+// @desc  Update task (any member can update)
 export async function update(req: Request, res: Response): Promise<void> {
   try {
     const orgId = req.currentOrgId;
@@ -89,6 +95,8 @@ export async function update(req: Request, res: Response): Promise<void> {
   }
 }
 
+// @route DELETE /api/tasks/:id
+// @desc  Delete task (owner can delete any, member can delete own only)
 export async function remove(req: Request, res: Response): Promise<void> {
   try {
     const orgId = req.currentOrgId;

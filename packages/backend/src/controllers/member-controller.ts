@@ -5,6 +5,8 @@ import { ValidationError } from "../utils/errors.js";
 import { sendSuccess, sendError } from "../utils/response.js";
 import "../types/express.js";
 
+// @route GET /api/members
+// @desc  List members (any member can view)
 export async function list(req: Request, res: Response): Promise<void> {
   try {
     const orgId = req.currentOrgId;
@@ -20,6 +22,8 @@ export async function list(req: Request, res: Response): Promise<void> {
   }
 }
 
+// @route PATCH /api/members/:id
+// @desc  Update member role (owner only)
 export async function update(req: Request, res: Response): Promise<void> {
   try {
     const orgId = req.currentOrgId;
@@ -55,6 +59,8 @@ export async function update(req: Request, res: Response): Promise<void> {
   }
 }
 
+// @route DELETE /api/members/:id
+// @desc  Remove member (owner only)
 export async function remove(req: Request, res: Response): Promise<void> {
   try {
     const orgId = req.currentOrgId;

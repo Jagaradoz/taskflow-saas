@@ -5,6 +5,8 @@ import { ValidationError } from "../utils/errors.js";
 import { sendSuccess, sendError } from "../utils/response.js";
 import "../types/express.js";
 
+// @route POST /api/auth/register
+// @desc  Register new user (public)
 export async function register(req: Request, res: Response): Promise<void> {
   try {
     const parseResult = registerSchema.safeParse(req.body);
@@ -27,6 +29,8 @@ export async function register(req: Request, res: Response): Promise<void> {
   }
 }
 
+// @route POST /api/auth/login
+// @desc  Login (public)
 export async function login(req: Request, res: Response): Promise<void> {
   try {
     const parseResult = loginSchema.safeParse(req.body);
@@ -49,6 +53,8 @@ export async function login(req: Request, res: Response): Promise<void> {
   }
 }
 
+// @route POST /api/auth/logout
+// @desc  Logout (authenticated)
 export function logout(req: Request, res: Response): void {
   req.session.destroy((err) => {
     if (err) {
@@ -61,6 +67,8 @@ export function logout(req: Request, res: Response): void {
   });
 }
 
+// @route GET /api/auth/me
+// @desc  Get current user (authenticated)
 export async function me(req: Request, res: Response): Promise<void> {
   try {
     const userId = req.user?.id;

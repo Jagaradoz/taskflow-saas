@@ -5,6 +5,8 @@ import { ValidationError } from "../utils/errors.js";
 import { sendSuccess, sendError } from "../utils/response.js";
 import "../types/express.js";
 
+// @route POST /api/orgs
+// @desc  Create organization (authenticated, no tenant required)
 export async function create(req: Request, res: Response): Promise<void> {
   try {
     const userId = req.user?.id;
@@ -34,6 +36,8 @@ export async function create(req: Request, res: Response): Promise<void> {
   }
 }
 
+// @route GET /api/orgs/:id
+// @desc  Get organization (authenticated + member of org)
 export async function getById(req: Request, res: Response): Promise<void> {
   try {
     const userId = req.user?.id;
@@ -54,6 +58,8 @@ export async function getById(req: Request, res: Response): Promise<void> {
   }
 }
 
+// @route PATCH /api/orgs/:id
+// @desc  Update organization (owner only)
 export async function update(req: Request, res: Response): Promise<void> {
   try {
     const orgId = req.params.id;
@@ -80,6 +86,8 @@ export async function update(req: Request, res: Response): Promise<void> {
   }
 }
 
+// @route POST /api/orgs/:id/switch
+// @desc  Switch active organization (authenticated)
 export async function switchOrg(req: Request, res: Response): Promise<void> {
   try {
     const userId = req.user?.id;

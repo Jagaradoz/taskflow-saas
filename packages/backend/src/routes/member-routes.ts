@@ -6,10 +6,8 @@ import { authorize } from "../middleware/authorize.middleware.js";
 
 const router = Router();
 
-// List members (any member can view)
 router.get("/", authenticate, requireTenant, memberController.list);
 
-// Update member role (owner only)
 router.patch(
   "/:id",
   authenticate,
@@ -18,7 +16,6 @@ router.patch(
   memberController.update,
 );
 
-// Remove member (owner only)
 router.delete(
   "/:id",
   authenticate,
