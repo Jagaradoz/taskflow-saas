@@ -2,7 +2,7 @@
 import { Router } from "express";
 
 // Local
-import { memberController } from "../controllers/MemberController.js";
+import { memberController } from "../controllers/member-controller.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 import { requireTenant } from "../middleware/tenant.middleware.js";
 import { authorize } from "../middleware/authorize.middleware.js";

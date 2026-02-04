@@ -1,11 +1,26 @@
 // Local
-import { memberRepository } from "../repositories/MemberRepository.js";
+import { memberRepository } from "../repositories/member-repository.js";
 import { NotFoundError, ForbiddenError } from "../utils/errors.js";
+import { cacheService, cacheKeys, cacheTTL } from "./cache-service.js";
 import type { MemberRole } from "../types/index.js";
 
 export const memberService = {
   async listMembers(orgId: string) {
-    return memberRepository.findByOrgId(orgId);
+    const cacheKey = cacheKeys.members(orgId);
+
+    // Check cache first
+    const cached = await cacheService.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    // Fetch from database
+    const members = await memberRepository.findByOrgId(orgId);
+
+    // Cache the result
+    await cacheService.set(cacheKey, members, cacheTTL.members);
+
+    return members;
   },
 
   async updateRole(
@@ -37,6 +52,9 @@ export const memberService = {
     if (!updated) {
       throw new NotFoundError("Membership not found");
     }
+
+    // Invalidate members cache
+    await cacheService.del(cacheKeys.members(currentOrgId));
 
     return updated;
   },
@@ -75,6 +93,9 @@ export const memberService = {
     if (!deleted) {
       throw new NotFoundError("Membership not found");
     }
+
+    // Invalidate members cache
+    await cacheService.del(cacheKeys.members(currentOrgId));
 
     return true;
   },

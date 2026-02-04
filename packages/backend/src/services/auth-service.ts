@@ -2,8 +2,9 @@
 import bcrypt from "bcrypt";
 
 // Local
-import { userRepository } from "../repositories/UserRepository.js";
+import { userRepository } from "../repositories/user-repository.js";
 import { ValidationError, UnauthorizedError } from "../utils/errors.js";
+import { cacheService, cacheKeys, cacheTTL } from "./cache-service.js";
 import type { RegisterInput, LoginInput } from "../validators/auth.schema.js";
 
 const SALT_ROUNDS = 12;
@@ -49,10 +50,22 @@ export const authService = {
   },
 
   async getCurrentUser(userId: string) {
+    const cacheKey = cacheKeys.user(userId);
+
+    // Check cache first
+    const cached = await cacheService.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    // Fetch from database
     const user = await userRepository.findByIdWithMemberships(userId);
     if (!user) {
       throw new UnauthorizedError("User not found");
     }
+
+    // Cache the result
+    await cacheService.set(cacheKey, user, cacheTTL.user);
 
     return user;
   },

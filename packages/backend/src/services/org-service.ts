@@ -2,8 +2,8 @@
 import { nanoid } from "nanoid";
 
 // Local
-import { orgRepository } from "../repositories/OrgRepository.js";
-import { memberRepository } from "../repositories/MemberRepository.js";
+import { orgRepository } from "../repositories/org-repository.js";
+import { memberRepository } from "../repositories/member-repository.js";
 import { NotFoundError, ForbiddenError } from "../utils/errors.js";
 import type {
   CreateOrgInput,

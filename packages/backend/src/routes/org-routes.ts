@@ -2,7 +2,7 @@
 import { Router } from "express";
 
 // Local
-import { orgController } from "../controllers/OrgController.js";
+import { orgController } from "../controllers/org-controller.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 import { requireTenant } from "../middleware/tenant.middleware.js";
 import { authorize } from "../middleware/authorize.middleware.js";

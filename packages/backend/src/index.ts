@@ -10,20 +10,32 @@ import pino from "pino";
 import { env } from "./config/env.js";
 import { errorHandler } from "./middleware/error.middleware.js";
 import { sessionMiddleware } from "./middleware/session.middleware.js";
-import { authRoutes } from "./routes/authRoutes.js";
-import { orgRoutes } from "./routes/orgRoutes.js";
-import { memberRoutes } from "./routes/memberRoutes.js";
 
-const logger = pino({
-  transport: {
-    target: "pino-pretty",
-    options: { colorize: true },
-  },
+// Endpoints
+import { authRoutes } from "./routes/auth-routes.js";
+import { memberRoutes } from "./routes/member-routes.js";
+import { orgRoutes } from "./routes/org-routes.js";
+import { systemRoutes } from "./routes/system-routes.js";
+
+export const logger = pino({
+  level: env.NODE_ENV === "production" ? "info" : "debug",
+  transport:
+    env.NODE_ENV !== "production"
+      ? {
+          target: "pino-pretty",
+          options: {
+            colorize: true,
+            translateTime: "SYS:standard",
+          },
+        }
+      : undefined,
 });
 
 const app = express();
 
-// Security middleware
+// Configurations
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
 app.use(
   cors({
@@ -32,27 +44,17 @@ app.use(
   }),
 );
 
-// Body parsing
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Session middleware
+// Middlewares
 app.use(sessionMiddleware);
 
-// Health check
-app.get("/health", (_req, res) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
-});
-
 // API routes
-app.use("/auth", authRoutes);
-app.use("/orgs", orgRoutes);
-app.use("/members", memberRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/orgs", orgRoutes);
+app.use("/api/members", memberRoutes);
+app.use("/api/system", systemRoutes);
 
-// Error handler (must be last)
 app.use(errorHandler);
 
-// Start server
 app.listen(env.PORT, () => {
   logger.info(`Server running on http://localhost:${env.PORT}`);
 });

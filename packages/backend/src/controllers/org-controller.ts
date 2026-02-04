@@ -2,8 +2,8 @@
 import type { Request, Response } from "express";
 
 // Local
-import { BaseController } from "./BaseController.js";
-import { orgService } from "../services/orgService.js";
+import { BaseController } from "./base-controller.js";
+import { orgService } from "../services/org-service.js";
 import { createOrgSchema, updateOrgSchema } from "../validators/org.schema.js";
 import { ValidationError } from "../utils/errors.js";
 import "../types/express.js";
