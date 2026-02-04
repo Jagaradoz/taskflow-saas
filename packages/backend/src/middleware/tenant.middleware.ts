@@ -2,9 +2,9 @@
 import type { Request, Response, NextFunction } from "express";
 
 // Local
-import { pool } from "../config/db.js";
+import { memberRepository } from "../repositories/member-repository.js";
 import { ForbiddenError } from "../utils/errors.js";
-import type { MemberRole, RequestMembership } from "../types/index.js";
+import type { RequestMembership } from "../types/index.js";
 import "../types/express.js";
 
 export const requireTenant = async (
@@ -24,12 +24,7 @@ export const requireTenant = async (
       throw new ForbiddenError("User not authenticated");
     }
 
-    const result = await pool.query<{ id: string; role: MemberRole }>(
-      "SELECT id, role FROM memberships WHERE user_id = $1 AND org_id = $2",
-      [userId, currentOrgId],
-    );
-
-    const membership = result.rows[0];
+    const membership = await memberRepository.findByUserAndOrg(userId, currentOrgId);
     if (!membership) {
       throw new ForbiddenError("Not a member of this organization");
     }

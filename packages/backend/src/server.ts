@@ -10,7 +10,7 @@ import { env } from "./config/env.js";
 import { logger } from "./config/logger.js";
 import { pool } from "./config/db.js";
 import { errorHandler } from "./middleware/error.middleware.js";
-import { sessionMiddleware } from "./middleware/session.middleware.js";
+import { sessionMiddleware } from "./config/session.js";
 
 // Endpoints
 import { authRoutes } from "./routes/auth-routes.js";
