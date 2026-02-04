@@ -31,6 +31,7 @@ export const orgService = {
     const org = await orgRepository.create({
       name: input.name,
       slug,
+      description: input.description,
     });
 
     // Create owner membership

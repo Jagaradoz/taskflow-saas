@@ -6,6 +6,7 @@ interface OrgRow {
   id: string;
   name: string;
   slug: string;
+  description?: string;
   created_at: Date;
   updated_at: Date;
 }
@@ -13,7 +14,7 @@ interface OrgRow {
 export const orgRepository = {
   async findById(id: string): Promise<Organization | null> {
     const result = await pool.query<OrgRow>(
-      "SELECT id, name, slug, created_at, updated_at FROM organizations WHERE id = $1",
+      "SELECT id, name, slug, description, created_at, updated_at FROM organizations WHERE id = $1",
       [id],
     );
 
@@ -24,6 +25,7 @@ export const orgRepository = {
       id: row.id,
       name: row.name,
       slug: row.slug,
+      description: row.description || null,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     };
@@ -31,7 +33,7 @@ export const orgRepository = {
 
   async findBySlug(slug: string): Promise<Organization | null> {
     const result = await pool.query<OrgRow>(
-      "SELECT id, name, slug, created_at, updated_at FROM organizations WHERE slug = $1",
+      "SELECT id, name, slug, description, created_at, updated_at FROM organizations WHERE slug = $1",
       [slug],
     );
 
@@ -42,17 +44,22 @@ export const orgRepository = {
       id: row.id,
       name: row.name,
       slug: row.slug,
+      description: row.description || null,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     };
   },
 
-  async create(data: { name: string; slug: string }): Promise<Organization> {
+  async create(data: {
+    name: string;
+    slug: string;
+    description?: string;
+  }): Promise<Organization> {
     const result = await pool.query<OrgRow>(
-      `INSERT INTO organizations (name, slug)
-       VALUES ($1, $2)
-       RETURNING id, name, slug, created_at, updated_at`,
-      [data.name, data.slug],
+      `INSERT INTO organizations (name, slug, description)
+       VALUES ($1, $2, $3)
+       RETURNING id, name, slug, description, created_at, updated_at`,
+      [data.name, data.slug, data.description || null],
     );
 
     const row = result.rows[0];
@@ -63,6 +70,7 @@ export const orgRepository = {
       id: row.id,
       name: row.name,
       slug: row.slug,
+      description: row.description || null,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     };
@@ -70,14 +78,16 @@ export const orgRepository = {
 
   async update(
     id: string,
-    data: { name?: string },
+    data: { name?: string; description?: string },
   ): Promise<Organization | null> {
     const result = await pool.query<OrgRow>(
       `UPDATE organizations
-       SET name = COALESCE($2, name), updated_at = NOW()
+       SET name = COALESCE($2, name), 
+           description = COALESCE($3, description),
+           updated_at = NOW()
        WHERE id = $1
-       RETURNING id, name, slug, created_at, updated_at`,
-      [id, data.name],
+       RETURNING id, name, slug, description, created_at, updated_at`,
+      [id, data.name, data.description],
     );
 
     const row = result.rows[0];
@@ -87,6 +97,7 @@ export const orgRepository = {
       id: row.id,
       name: row.name,
       slug: row.slug,
+      description: row.description || null,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     };
