@@ -3,6 +3,7 @@ import Redis from "ioredis";
 
 // Local
 import { env } from "./env.js";
+import { logger } from "./logger.js";
 
 export const redis = new Redis(env.REDIS_URL, {
   maxRetriesPerRequest: 3,
@@ -13,9 +14,9 @@ export const redis = new Redis(env.REDIS_URL, {
 });
 
 redis.on("error", (err) => {
-  console.error("Redis connection error:", err.message);
+  logger.error("Redis connection error: %s", err.message);
 });
 
 redis.on("connect", () => {
-  console.log("Redis connected");
+  logger.info("Redis connected");
 });

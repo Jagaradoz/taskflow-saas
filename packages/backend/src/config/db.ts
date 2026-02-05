@@ -3,6 +3,7 @@ import pg from "pg";
 
 // Local
 import { env } from "./env.js";
+import { logger } from "./logger.js";
 
 export const pool = new pg.Pool({
   connectionString: env.DATABASE_URL,
@@ -12,14 +13,14 @@ export const pool = new pg.Pool({
 });
 
 pool.on("error", (err) => {
-  console.error("Database pool error:", err.message);
+  logger.error("Database pool error: %s", err.message);
 });
 
 pool.on("connect", () => {
-  console.log("Database connected");
+  logger.info("Database connected");
 });
 
 export const closeDatabase = async (): Promise<void> => {
   await pool.end();
-  console.log("Database connection closed");
+  logger.info("Database connection closed");
 };

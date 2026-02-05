@@ -1,0 +1,25 @@
+info:
+  name: update-org
+  type: http
+  seq: 3
+
+http:
+  method: PATCH
+  url: http://localhost:5000/api/orgs/:id
+  params:
+    - name: id
+      value: c268eb17-bd95-4e63-85c3-ce0762e0266f
+      type: path
+  body:
+    type: json
+    data: |-
+      {
+        "description": "Updated description"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

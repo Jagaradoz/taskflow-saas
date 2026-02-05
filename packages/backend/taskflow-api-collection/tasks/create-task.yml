@@ -1,0 +1,21 @@
+info:
+  name: create-task
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: http://localhost:5000/api/tasks
+  body:
+    type: json
+    data: |-
+      {
+        "title": "New task"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

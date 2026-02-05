@@ -2,7 +2,7 @@
 import type { Request, Response, NextFunction } from "express";
 
 // Local
-import { pool } from "../config/db.js";
+import { userRepository } from "../repositories/user-repository.js";
 import { UnauthorizedError } from "../utils/errors.js";
 import type { RequestUser } from "../types/index.js";
 import "../types/express.js";
@@ -19,13 +19,7 @@ export const authenticate = async (
       throw new UnauthorizedError("Not authenticated");
     }
 
-    const result = await pool.query<{
-      id: string;
-      email: string;
-      name: string;
-    }>("SELECT id, email, name FROM users WHERE id = $1", [userId]);
-
-    const user = result.rows[0];
+    const user = await userRepository.findById(userId);
     if (!user) {
       req.session.destroy(() => {});
       throw new UnauthorizedError("User not found");
