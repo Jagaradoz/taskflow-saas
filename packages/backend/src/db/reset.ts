@@ -1,6 +1,5 @@
 import "dotenv/config";
 import pg from "pg";
-import { execSync } from "child_process";
 
 const { Pool } = pg;
 
@@ -21,14 +20,6 @@ async function reset() {
   } finally {
     await pool.end();
   }
-
-  // Run migrations
-  console.log("\nRunning migrations...");
-  execSync("npm run db:migrate", { stdio: "inherit" });
-
-  // Run seeds
-  console.log("\nRunning seed...");
-  execSync("npm run db:seed", { stdio: "inherit" });
 }
 
 reset().catch((err) => {

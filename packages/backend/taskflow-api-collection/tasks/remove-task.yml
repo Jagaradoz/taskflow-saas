@@ -1,21 +1,15 @@
 info:
-  name: update-member
+  name: remove-task
   type: http
-  seq: 2
+  seq: 4
 
 http:
-  method: PATCH
-  url: http://localhost:5000/api/members/:id
+  method: DELETE
+  url: http://localhost:5000/api/tasks/:id
   params:
     - name: id
       value: ""
       type: path
-  body:
-    type: json
-    data: |-
-      {
-        "role": "member"
-      }
   auth: inherit
 
 settings:

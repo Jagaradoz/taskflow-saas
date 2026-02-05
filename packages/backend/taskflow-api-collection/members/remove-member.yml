@@ -6,10 +6,11 @@ info:
 http:
   method: DELETE
   url: http://localhost:5000/api/members/:id
-  auth: inherit
   params:
-    path:
-      id: ""
+    - name: id
+      value: ""
+      type: path
+  auth: inherit
 
 settings:
   encodeUrl: true

@@ -1,11 +1,11 @@
 info:
-  name: update-member
+  name: update-task
   type: http
-  seq: 2
+  seq: 3
 
 http:
   method: PATCH
-  url: http://localhost:5000/api/members/:id
+  url: http://localhost:5000/api/tasks/:id
   params:
     - name: id
       value: ""
@@ -14,7 +14,9 @@ http:
     type: json
     data: |-
       {
-        "role": "member"
+        "title": "Updated task",
+        "isDone": false,
+        "isPinned": false
       }
   auth: inherit
 

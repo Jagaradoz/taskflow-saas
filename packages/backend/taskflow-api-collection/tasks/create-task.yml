@@ -1,20 +1,16 @@
 info:
-  name: update-member
+  name: create-task
   type: http
   seq: 2
 
 http:
-  method: PATCH
-  url: http://localhost:5000/api/members/:id
-  params:
-    - name: id
-      value: ""
-      type: path
+  method: POST
+  url: http://localhost:5000/api/tasks
   body:
     type: json
     data: |-
       {
-        "role": "member"
+        "title": "New task"
       }
   auth: inherit
 

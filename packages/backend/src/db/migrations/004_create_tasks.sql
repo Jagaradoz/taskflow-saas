@@ -4,6 +4,7 @@ CREATE TABLE tasks (
     org_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
     created_by UUID REFERENCES users(id) ON DELETE SET NULL,
     title TEXT NOT NULL,
+    description TEXT,
     is_done BOOLEAN NOT NULL DEFAULT FALSE,
     is_pinned BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
