@@ -8,7 +8,7 @@ http:
   url: http://localhost:5000/api/orgs/:id
   params:
     - name: id
-      value: c268eb17-bd95-4e63-85c3-ce0762e0266f
+      value: ed4cdd12-e025-4da4-b5da-92220a02d457
       type: path
   body:
     type: json

@@ -1,0 +1,26 @@
+info:
+  name: create-invite
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:5000/api/orgs/{{orgId}}/invites
+  body:
+    type: json
+    data: |-
+      {
+        "userId": "b7eebc99-9c0b-4ef8-bb6d-6bb9bd380a88",
+        "role": "member"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+vars:pre-request:
+  - name: orgId
+    value: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11

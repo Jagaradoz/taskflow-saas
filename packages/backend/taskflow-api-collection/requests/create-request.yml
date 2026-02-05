@@ -1,0 +1,25 @@
+info:
+  name: create-request
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:5000/api/orgs/{{slug}}/requests
+  body:
+    type: json
+    data: |-
+      {
+        "message": "I would like to join your organization!"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+vars:pre-request:
+  - name: slug
+    value: acme-corp

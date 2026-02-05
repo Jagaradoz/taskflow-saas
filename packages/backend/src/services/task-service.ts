@@ -23,11 +23,17 @@ export const taskService = {
     return tasks;
   },
 
-  async createTask(orgId: string, userId: string, title: string) {
+  async createTask(
+    orgId: string,
+    userId: string,
+    title: string,
+    description?: string | null,
+  ) {
     const task = await taskRepository.create({
       orgId,
       createdBy: userId,
       title,
+      description,
     });
 
     // Invalidate cache
@@ -39,7 +45,12 @@ export const taskService = {
   async updateTask(
     taskId: string,
     orgId: string,
-    updates: { title?: string; isDone?: boolean; isPinned?: boolean },
+    updates: {
+      title?: string;
+      description?: string | null;
+      isDone?: boolean;
+      isPinned?: boolean;
+    },
   ) {
     const task = await taskRepository.findById(taskId, orgId);
     if (!task) {

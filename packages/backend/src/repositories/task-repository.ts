@@ -7,6 +7,7 @@ interface TaskRow {
   org_id: string;
   created_by: string | null;
   title: string;
+  description: string | null;
   is_done: boolean;
   is_pinned: boolean;
   created_at: Date;
@@ -19,6 +20,7 @@ function rowToTask(row: TaskRow): Task {
     orgId: row.org_id,
     createdBy: row.created_by,
     title: row.title,
+    description: row.description,
     isDone: row.is_done,
     isPinned: row.is_pinned,
     createdAt: row.created_at,
@@ -29,7 +31,7 @@ function rowToTask(row: TaskRow): Task {
 export const taskRepository = {
   async findByOrgId(orgId: string): Promise<Task[]> {
     const result = await pool.query<TaskRow>(
-      `SELECT id, org_id, created_by, title, is_done, is_pinned, created_at, updated_at
+      `SELECT id, org_id, created_by, title, description, is_done, is_pinned, created_at, updated_at
        FROM tasks
        WHERE org_id = $1
        ORDER BY is_pinned DESC, created_at DESC`,
@@ -41,7 +43,7 @@ export const taskRepository = {
 
   async findById(id: string, orgId: string): Promise<Task | null> {
     const result = await pool.query<TaskRow>(
-      `SELECT id, org_id, created_by, title, is_done, is_pinned, created_at, updated_at
+      `SELECT id, org_id, created_by, title, description, is_done, is_pinned, created_at, updated_at
        FROM tasks
        WHERE id = $1 AND org_id = $2`,
       [id, orgId],
@@ -57,12 +59,13 @@ export const taskRepository = {
     orgId: string;
     createdBy: string;
     title: string;
+    description?: string | null;
   }): Promise<Task> {
     const result = await pool.query<TaskRow>(
-      `INSERT INTO tasks (org_id, created_by, title)
-       VALUES ($1, $2, $3)
-       RETURNING id, org_id, created_by, title, is_done, is_pinned, created_at, updated_at`,
-      [data.orgId, data.createdBy, data.title],
+      `INSERT INTO tasks (org_id, created_by, title, description)
+       VALUES ($1, $2, $3, $4)
+       RETURNING id, org_id, created_by, title, description, is_done, is_pinned, created_at, updated_at`,
+      [data.orgId, data.createdBy, data.title, data.description ?? null],
     );
 
     const row = result.rows[0];
@@ -75,7 +78,7 @@ export const taskRepository = {
   async update(
     id: string,
     orgId: string,
-    data: Partial<Pick<Task, "title" | "isDone" | "isPinned">>,
+    data: Partial<Pick<Task, "title" | "description" | "isDone" | "isPinned">>,
   ): Promise<Task | null> {
     const updates: string[] = [];
     const values: unknown[] = [];
@@ -84,6 +87,10 @@ export const taskRepository = {
     if (data.title !== undefined) {
       updates.push(`title = $${paramIndex++}`);
       values.push(data.title);
+    }
+    if (data.description !== undefined) {
+      updates.push(`description = $${paramIndex++}`);
+      values.push(data.description);
     }
     if (data.isDone !== undefined) {
       updates.push(`is_done = $${paramIndex++}`);
@@ -105,7 +112,7 @@ export const taskRepository = {
       `UPDATE tasks
        SET ${updates.join(", ")}
        WHERE id = $${paramIndex++} AND org_id = $${paramIndex}
-       RETURNING id, org_id, created_by, title, is_done, is_pinned, created_at, updated_at`,
+       RETURNING id, org_id, created_by, title, description, is_done, is_pinned, created_at, updated_at`,
       values,
     );
 

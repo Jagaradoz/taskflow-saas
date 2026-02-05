@@ -1,0 +1,28 @@
+info:
+  name: resolve-request
+  type: http
+  seq: 3
+
+http:
+  method: PATCH
+  url: http://localhost:5000/api/orgs/{{orgId}}/requests/{{requestId}}
+  body:
+    type: json
+    data: |-
+      {
+        "action": "approve",
+        "role": "member"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+vars:pre-request:
+  - name: orgId
+    value: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
+  - name: requestId
+    value: b2eebc99-9c0b-4ef8-bb6d-6bb9bd380d12

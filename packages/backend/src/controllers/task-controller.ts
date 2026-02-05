@@ -54,6 +54,7 @@ export async function create(req: Request, res: Response): Promise<void> {
       orgId,
       userId,
       parseResult.data.title,
+      parseResult.data.description,
     );
 
     sendSuccess(res, { task }, 201);
