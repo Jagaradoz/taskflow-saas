@@ -5,7 +5,11 @@ info:
 
 http:
   method: POST
-  url: http://localhost:5000/api/me/invites/{{inviteId}}/decline
+  url: http://localhost:5000/api/me/invites/:inviteId/decline
+  params:
+    - name: inviteId
+      value: a1eebc99-9c0b-4ef8-bb6d-6bb9bd380d01
+      type: path
   auth: inherit
 
 settings:
@@ -13,7 +17,3 @@ settings:
   timeout: 0
   followRedirects: true
   maxRedirects: 5
-
-vars:pre-request:
-  - name: inviteId
-    value: a1eebc99-9c0b-4ef8-bb6d-6bb9bd380d01

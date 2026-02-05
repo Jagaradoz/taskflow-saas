@@ -9,7 +9,7 @@ const router = Router();
 // Public join request (user just needs to be authenticated)
 router.post("/orgs/:slug/requests", authenticate, joinRequestController.create);
 
-// Org-scoped request management (owner/admin only)
+// Org-scoped request management (owner only)
 router.get(
   "/orgs/:orgId/requests",
   authenticate,

@@ -8,7 +8,7 @@ http:
   url: http://localhost:5000/api/members/:id
   params:
     - name: id
-      value: ""
+      value: PASTE_ID_FROM_list-members_RESPONSE
       type: path
   body:
     type: json

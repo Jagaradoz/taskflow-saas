@@ -6,7 +6,7 @@ import { authorize } from "../middleware/authorize.middleware.js";
 
 const router = Router();
 
-// Org-scoped invite routes (owner/admin only)
+// Org-scoped invite routes (owner only)
 router.post(
   "/orgs/:orgId/invites",
   authenticate,

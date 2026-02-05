@@ -5,13 +5,12 @@ info:
 
 http:
   method: POST
-  url: http://localhost:5000/api/orgs/c7cb786b-f27c-451e-b417-008799df11a5/switch
+  url: http://localhost:5000/api/orgs/:orgId/switch
+  params:
+    - name: orgId
+      value: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
+      type: path
   auth: inherit
-
-runtime:
-  variables:
-    - name: id
-      value: c7cb786b-f27c-451e-b417-008799df11a5
 
 settings:
   encodeUrl: true

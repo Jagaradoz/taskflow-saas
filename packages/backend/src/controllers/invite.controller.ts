@@ -6,7 +6,7 @@ import { sendSuccess, sendError } from "../utils/response.js";
 import "../types/express.js";
 
 // @route POST /api/orgs/:orgId/invites
-// @desc  Create invite (owner/admin only)
+// @desc  Create invite (owner only)
 export async function create(req: Request, res: Response): Promise<void> {
   try {
     const orgId = req.currentOrgId;
@@ -44,7 +44,7 @@ export async function create(req: Request, res: Response): Promise<void> {
 }
 
 // @route GET /api/orgs/:orgId/invites
-// @desc  List org invites (owner/admin only)
+// @desc  List org invites (owner only)
 export async function list(req: Request, res: Response): Promise<void> {
   try {
     const orgId = req.currentOrgId;
@@ -71,7 +71,7 @@ export async function list(req: Request, res: Response): Promise<void> {
 }
 
 // @route DELETE /api/orgs/:orgId/invites/:id
-// @desc  Revoke invite (owner/admin only)
+// @desc  Revoke invite (owner only)
 export async function revoke(req: Request, res: Response): Promise<void> {
   try {
     const orgId = req.currentOrgId;

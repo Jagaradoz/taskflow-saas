@@ -69,7 +69,7 @@ export const joinRequestService = {
   async approveRequest(
     requestId: string,
     approvedBy: string,
-    role: "admin" | "member" = "member",
+    role: "member" = "member",
   ) {
     const request = await membershipRequestRepository.findById(requestId);
     if (!request) {

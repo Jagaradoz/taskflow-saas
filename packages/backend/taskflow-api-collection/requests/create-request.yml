@@ -5,7 +5,11 @@ info:
 
 http:
   method: POST
-  url: http://localhost:5000/api/orgs/{{slug}}/requests
+  url: http://localhost:5000/api/orgs/:slug/requests
+  params:
+    - name: slug
+      value: acme-corp
+      type: path
   body:
     type: json
     data: |-
@@ -19,7 +23,3 @@ settings:
   timeout: 0
   followRedirects: true
   maxRedirects: 5
-
-vars:pre-request:
-  - name: slug
-    value: acme-corp

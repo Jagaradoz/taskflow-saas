@@ -10,8 +10,8 @@ export const resolveRequestSchema = z.object({
     errorMap: () => ({ message: "Action must be 'approve' or 'reject'" }),
   }),
   role: z
-    .enum(["admin", "member"], {
-      errorMap: () => ({ message: "Role must be 'admin' or 'member'" }),
+    .enum(["member"], {
+      errorMap: () => ({ message: "Role must be 'member'" }),
     })
     .optional(),
 });

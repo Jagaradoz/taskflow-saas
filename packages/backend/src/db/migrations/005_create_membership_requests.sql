@@ -1,7 +1,3 @@
--- Types: add 'admin' to member_role enum
-ALTER TYPE member_role ADD VALUE 'admin';
-
-
 -- Tables: create membership_requests table for invites and join requests
 CREATE TABLE membership_requests (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -16,7 +12,7 @@ CREATE TABLE membership_requests (
     requester_id UUID REFERENCES users(id) ON DELETE CASCADE,
 
     -- Shared
-    role VARCHAR(10) NOT NULL CHECK (role IN ('admin', 'member')),
+    role VARCHAR(10) NOT NULL CHECK (role IN ('member')),
     status VARCHAR(10) NOT NULL DEFAULT 'pending'
            CHECK (status IN ('pending', 'accepted', 'declined', 'rejected', 'revoked')),
     message TEXT,

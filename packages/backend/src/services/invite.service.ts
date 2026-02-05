@@ -14,7 +14,7 @@ export const inviteService = {
   async createInvite(
     orgId: string,
     targetUserId: string,
-    role: "admin" | "member",
+    role: "member",
     invitedBy: string,
   ) {
     // Check if target user exists
@@ -121,7 +121,7 @@ export const inviteService = {
     const membership = await memberRepository.create({
       userId,
       orgId: invite.orgId,
-      role: invite.role,
+      role: "member",
     });
 
     // Update invite status

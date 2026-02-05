@@ -13,7 +13,7 @@ interface MembershipRequestRow {
   invited_user_id: string | null;
   invited_by: string | null;
   requester_id: string | null;
-  role: "admin" | "member";
+  role: "member";
   status: MembershipRequestStatus;
   message: string | null;
   created_at: Date;

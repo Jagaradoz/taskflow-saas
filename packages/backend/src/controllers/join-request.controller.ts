@@ -4,7 +4,7 @@ import {
   createRequestSchema,
   resolveRequestSchema,
 } from "../validators/join-request.schema.js";
-import { ValidationError } from "../utils/errors.js";
+import { ValidationError, ForbiddenError } from "../utils/errors.js";
 import { sendSuccess, sendError } from "../utils/response.js";
 import "../types/express.js";
 
@@ -46,17 +46,26 @@ export async function create(req: Request, res: Response): Promise<void> {
 }
 
 // @route GET /api/orgs/:orgId/requests
-// @desc  List org requests (owner/admin only)
+// @desc  List org requests (owner only)
 export async function list(req: Request, res: Response): Promise<void> {
   try {
-    const orgId = req.currentOrgId;
-    if (!orgId) {
+    const sessionOrgId = req.currentOrgId;
+    const paramOrgId = req.params.orgId;
+
+    if (!sessionOrgId) {
       throw new ValidationError("Organization not selected");
+    }
+
+    // Ensure the URL parameter matches the session context to avoid confusion
+    if (paramOrgId && paramOrgId !== sessionOrgId) {
+      throw new ForbiddenError(
+        "Organization ID mismatch. You are currently browsing a different organization.",
+      );
     }
 
     const status = req.query.status as string | undefined;
     const requests = await joinRequestService.listOrgRequests(
-      orgId,
+      sessionOrgId,
       status as
         | "pending"
         | "accepted"
@@ -73,7 +82,7 @@ export async function list(req: Request, res: Response): Promise<void> {
 }
 
 // @route PATCH /api/orgs/:orgId/requests/:id
-// @desc  Resolve request (owner/admin only)
+// @desc  Resolve request (owner only)
 export async function resolve(req: Request, res: Response): Promise<void> {
   try {
     const orgId = req.currentOrgId;
