@@ -18,6 +18,8 @@ import { memberRoutes } from "./routes/member-routes.js";
 import { orgRoutes } from "./routes/org-routes.js";
 import { systemRoutes } from "./routes/system-routes.js";
 import { taskRoutes } from "./routes/task-routes.js";
+import { inviteRoutes } from "./routes/invite.routes.js";
+import { joinRequestRoutes } from "./routes/join-request.routes.js";
 
 const app = express();
 
@@ -41,6 +43,8 @@ app.use("/api/orgs", orgRoutes);
 app.use("/api/members", memberRoutes);
 app.use("/api/system", systemRoutes);
 app.use("/api/tasks", taskRoutes);
+app.use("/api", inviteRoutes);
+app.use("/api", joinRequestRoutes);
 
 app.use(errorHandler);
 

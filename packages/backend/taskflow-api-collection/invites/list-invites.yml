@@ -5,11 +5,11 @@ info:
 
 http:
   method: GET
-  url: http://localhost:5000/api/orgs/{{orgId}}/invites
+  url: http://localhost:5000/api/orgs/:orgId/invites
   params:
-    - name: status
-      value: pending
-      enabled: false
+    - name: orgId
+      value: ""
+      type: path
   auth: inherit
 
 settings:
@@ -17,7 +17,3 @@ settings:
   timeout: 0
   followRedirects: true
   maxRedirects: 5
-
-vars:pre-request:
-  - name: orgId
-    value: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
