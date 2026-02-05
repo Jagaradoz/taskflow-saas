@@ -60,7 +60,16 @@ export const orgService = {
   },
 
   async updateOrg(orgId: string, input: UpdateOrgInput) {
-    const org = await orgRepository.update(orgId, input);
+    let slug: string | undefined;
+    if (input.name) {
+      slug = generateSlug(input.name);
+      const exists = await orgRepository.slugExists(slug, orgId);
+      if (exists) {
+        slug = `${slug}-${nanoid(6)}`;
+      }
+    }
+
+    const org = await orgRepository.update(orgId, { ...input, slug });
     if (!org) {
       throw new NotFoundError("Organization not found");
     }

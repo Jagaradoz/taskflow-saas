@@ -78,16 +78,17 @@ export const orgRepository = {
 
   async update(
     id: string,
-    data: { name?: string; description?: string },
+    data: { name?: string; slug?: string; description?: string },
   ): Promise<Organization | null> {
     const result = await pool.query<OrgRow>(
       `UPDATE organizations
-       SET name = COALESCE($2, name), 
-           description = COALESCE($3, description),
+       SET name = COALESCE($2, name),
+           slug = COALESCE($3, slug),
+           description = COALESCE($4, description),
            updated_at = NOW()
        WHERE id = $1
        RETURNING id, name, slug, description, created_at, updated_at`,
-      [id, data.name, data.description],
+      [id, data.name, data.slug, data.description],
     );
 
     const row = result.rows[0];
@@ -103,10 +104,12 @@ export const orgRepository = {
     };
   },
 
-  async slugExists(slug: string): Promise<boolean> {
+  async slugExists(slug: string, excludeId?: string): Promise<boolean> {
     const result = await pool.query<{ exists: boolean }>(
-      "SELECT EXISTS(SELECT 1 FROM organizations WHERE slug = $1) as exists",
-      [slug],
+      excludeId
+        ? "SELECT EXISTS(SELECT 1 FROM organizations WHERE slug = $1 AND id != $2) as exists"
+        : "SELECT EXISTS(SELECT 1 FROM organizations WHERE slug = $1) as exists",
+      excludeId ? [slug, excludeId] : [slug],
     );
     return result.rows[0]?.exists ?? false;
   },
