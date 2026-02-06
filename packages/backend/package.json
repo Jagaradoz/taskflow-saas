@@ -10,10 +10,10 @@
     "lint": "eslint src/",
     "test": "vitest run",
     "test:watch": "vitest",
-    "db:migrate": "tsx src/db/migrate.ts",
+    "db:init": "tsx src/db/migrate.ts",
     "db:seed": "tsx src/db/seed.ts",
-    "db:reset": "tsx src/db/reset.ts",
-    "db:setup": "npm run db:migrate && npm run db:seed"
+    "db:drop": "tsx src/db/reset.ts",
+    "db:setup": "npm run db:drop && npm run db:init && npm run db:seed"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
