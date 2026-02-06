@@ -4,55 +4,11 @@ import type {
   MembershipRequest,
   MembershipRequestType,
   MembershipRequestStatus,
-} from "../types/index.js";
-
-interface MembershipRequestRow {
-  id: string;
-  org_id: string;
-  type: MembershipRequestType;
-  invited_user_id: string | null;
-  invited_by: string | null;
-  requester_id: string | null;
-  role: "owner" | "member";
-  status: MembershipRequestStatus;
-  message: string | null;
-  created_at: Date;
-  updated_at: Date;
-  resolved_at: Date | null;
-  resolved_by: string | null;
-}
-
-interface MembershipRequestWithUserRow extends MembershipRequestRow {
-  user_name: string;
-  user_email: string;
-  inviter_name: string | null;
-  org_name: string | null;
-  org_slug: string | null;
-}
-
-export interface MembershipRequestWithUser extends MembershipRequest {
-  user: {
-    name: string;
-    email: string;
-  };
-  inviter?: {
-    name: string;
-  };
-  org?: {
-    name: string;
-    slug: string;
-  };
-}
-
-export interface CreateMembershipRequestData {
-  orgId: string;
-  type: MembershipRequestType;
-  invitedUserId?: string;
-  invitedBy?: string;
-  requesterId?: string;
-  role: "owner" | "member";
-  message?: string;
-}
+  MembershipRequestRow,
+  MembershipRequestWithUserRow,
+  MembershipRequestWithUser,
+  CreateMembershipRequestData,
+} from "../types/membership-request.js";
 
 function mapRowToMembershipRequest(
   row: MembershipRequestRow,

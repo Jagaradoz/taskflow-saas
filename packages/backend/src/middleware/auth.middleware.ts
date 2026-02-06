@@ -4,7 +4,7 @@ import type { Request, Response, NextFunction } from "express";
 // Local
 import { userRepository } from "../repositories/user-repository.js";
 import { UnauthorizedError } from "../utils/errors.js";
-import type { RequestUser } from "../types/index.js";
+import type { RequestUser } from "../types/express.js";
 import "../types/express.js";
 
 export const authenticate = async (

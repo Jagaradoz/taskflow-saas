@@ -1,32 +1,11 @@
 // Local
 import { pool } from "../config/db.js";
-import type { User, MemberRole } from "../types/index.js";
-
-interface UserRow {
-  id: string;
-  email: string;
-  password: string;
-  name: string;
-  created_at: Date;
-}
-
-interface MembershipWithOrgRow {
-  id: string;
-  org_id: string;
-  org_name: string;
-  org_slug: string;
-  role: MemberRole;
-}
-
-export interface UserWithMemberships extends User {
-  memberships: Array<{
-    id: string;
-    orgId: string;
-    orgName: string;
-    orgSlug: string;
-    role: MemberRole;
-  }>;
-}
+import type {
+  User,
+  UserRow,
+  MembershipWithOrgRow,
+  UserWithMemberships,
+} from "../types/user.js";
 
 export const userRepository = {
   async findByEmail(

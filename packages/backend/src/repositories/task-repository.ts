@@ -1,18 +1,6 @@
 // Local
 import { pool } from "../config/db.js";
-import type { Task } from "../types/index.js";
-
-interface TaskRow {
-  id: string;
-  org_id: string;
-  created_by: string | null;
-  title: string;
-  description: string | null;
-  is_done: boolean;
-  is_pinned: boolean;
-  created_at: Date;
-  updated_at: Date;
-}
+import type { Task, TaskRow } from "../types/task.js";
 
 function rowToTask(row: TaskRow): Task {
   return {

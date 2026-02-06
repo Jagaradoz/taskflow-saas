@@ -8,7 +8,7 @@ import {
   ForbiddenError,
   ValidationError,
 } from "../utils/errors.js";
-import type { MembershipRequestStatus } from "../types/index.js";
+import type { MembershipRequestStatus } from "../types/membership-request.js";
 
 export const inviteService = {
   async createInvite(

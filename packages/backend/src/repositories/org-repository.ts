@@ -1,15 +1,6 @@
 // Local
 import { pool } from "../config/db.js";
-import type { Organization } from "../types/index.js";
-
-interface OrgRow {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string;
-  created_at: Date;
-  updated_at: Date;
-}
+import type { Organization, OrgRow } from "../types/organization.js";
 
 export const orgRepository = {
   async findById(id: string): Promise<Organization | null> {

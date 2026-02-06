@@ -1,18 +1,24 @@
 info:
-  name: reject-request
+  name: approve-request
   type: http
-  seq: 7
+  seq: 6
 
 http:
   method: POST
-  url: http://localhost:5000/api/orgs/:orgId/requests/:requestId/reject
+  url: http://localhost:5000/api/orgs/:orgId/requests/:id/approve
   params:
     - name: orgId
       value: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
       type: path
-    - name: requestId
+    - name: id
       value: b2eebc99-9c0b-4ef8-bb6d-6bb9bd380d12
       type: path
+  body:
+    type: json
+    data: |-
+      {
+        "role": "member"
+      }
   auth: inherit
 
 settings:

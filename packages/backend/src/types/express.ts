@@ -1,5 +1,16 @@
 // Local
-import type { RequestUser, RequestMembership } from "./index.js";
+import type { MemberRole } from "./membership.js";
+
+export interface RequestUser {
+  id: string;
+  email: string;
+  name: string;
+}
+
+export interface RequestMembership {
+  id: string;
+  role: MemberRole;
+}
 
 declare global {
   namespace Express {
@@ -10,5 +21,3 @@ declare global {
     }
   }
 }
-
-export {};

@@ -1,31 +1,12 @@
 // Local
 import { pool } from "../config/db.js";
-import type { Membership, MemberRole } from "../types/index.js";
-
-interface MembershipRow {
-  id: string;
-  user_id: string;
-  org_id: string;
-  role: MemberRole;
-  created_at: Date;
-}
-
-interface MemberWithUserRow {
-  id: string;
-  user_id: string;
-  org_id: string;
-  role: MemberRole;
-  created_at: Date;
-  user_email: string;
-  user_name: string;
-}
-
-export interface MemberWithUser extends Membership {
-  user: {
-    email: string;
-    name: string;
-  };
-}
+import type {
+  Membership,
+  MemberRole,
+  MembershipRow,
+  MemberWithUserRow,
+  MemberWithUser,
+} from "../types/membership.js";
 
 export const memberRepository = {
   async create(data: {

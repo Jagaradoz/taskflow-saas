@@ -5,12 +5,12 @@ info:
 
 http:
   method: DELETE
-  url: http://localhost:5000/api/orgs/:orgId/invites/:inviteId
+  url: http://localhost:5000/api/orgs/:orgId/invites/:id
   params:
     - name: orgId
       value: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
       type: path
-    - name: inviteId
+    - name: id
       value: a2eebc99-9c0b-4ef8-bb6d-6bb9bd380d02
       type: path
   auth: inherit

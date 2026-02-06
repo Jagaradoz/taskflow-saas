@@ -8,7 +8,7 @@ import {
   ForbiddenError,
   ValidationError,
 } from "../utils/errors.js";
-import type { MembershipRequestStatus } from "../types/index.js";
+import type { MembershipRequestStatus } from "../types/membership-request.js";
 
 export const joinRequestService = {
   async createRequest(orgSlug: string, userId: string, message?: string) {
