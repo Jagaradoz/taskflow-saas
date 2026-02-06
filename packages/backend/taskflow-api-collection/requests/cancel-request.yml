@@ -8,7 +8,7 @@ http:
   url: http://localhost:5000/api/me/requests/:requestId
   params:
     - name: requestId
-      value: PASTE_ID_FROM_create-request_RESPONSE
+      value: b1eebc99-9c0b-4ef8-bb6d-6bb9bd380d11
       type: path
   auth: inherit
 

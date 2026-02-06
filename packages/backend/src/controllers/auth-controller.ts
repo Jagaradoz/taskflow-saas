@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { authService } from "../services/auth-service.js";
 import { registerSchema, loginSchema } from "../validators/auth.schema.js";
-import { ValidationError } from "../utils/errors.js";
+import { ValidationError, UnauthorizedError } from "../utils/errors.js";
 import { sendSuccess, sendError } from "../utils/response.js";
 import "../types/express.js";
 
@@ -73,7 +73,7 @@ export async function me(req: Request, res: Response): Promise<void> {
   try {
     const userId = req.user?.id;
     if (!userId) {
-      throw new ValidationError("User not found in session");
+      throw new UnauthorizedError("User not found in session");
     }
 
     const user = await authService.getCurrentUser(userId);

@@ -11,7 +11,7 @@ router.post(
   "/orgs/:orgId/invites",
   authenticate,
   requireTenant,
-  authorize("owner", "admin"),
+  authorize("owner"),
   inviteController.create,
 );
 
@@ -19,7 +19,7 @@ router.get(
   "/orgs/:orgId/invites",
   authenticate,
   requireTenant,
-  authorize("owner", "admin"),
+  authorize("owner"),
   inviteController.list,
 );
 
@@ -27,7 +27,7 @@ router.delete(
   "/orgs/:orgId/invites/:id",
   authenticate,
   requireTenant,
-  authorize("owner", "admin"),
+  authorize("owner"),
   inviteController.revoke,
 );
 

@@ -15,7 +15,7 @@ export interface MembershipRequest {
   invitedUserId: string | null;
   invitedBy: string | null;
   requesterId: string | null;
-  role: "admin" | "member";
+  role: MemberRole;
   status: MembershipRequestStatus;
   message: string | null;
   createdAt: Date;

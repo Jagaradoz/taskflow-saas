@@ -5,16 +5,13 @@ export const createRequestSchema = z.object({
   message: z.string().max(500).optional(),
 });
 
-export const resolveRequestSchema = z.object({
-  action: z.enum(["approve", "reject"], {
-    errorMap: () => ({ message: "Action must be 'approve' or 'reject'" }),
-  }),
+export const approveRequestSchema = z.object({
   role: z
-    .enum(["member"], {
-      errorMap: () => ({ message: "Role must be 'member'" }),
+    .enum(["owner", "member"], {
+      errorMap: () => ({ message: "Role must be 'owner' or 'member'" }),
     })
     .optional(),
 });
 
 export type CreateRequestInput = z.infer<typeof createRequestSchema>;
-export type ResolveRequestInput = z.infer<typeof resolveRequestSchema>;
+export type ApproveRequestInput = z.infer<typeof approveRequestSchema>;

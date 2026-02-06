@@ -1,7 +1,7 @@
 -- Data: insert sample membership requests (invites and join requests)
 INSERT INTO membership_requests (id, org_id, type, invited_user_id, invited_by, requester_id, role, status, message, resolved_at, resolved_by) VALUES
     -- Pending invites
-    -- Diana (Startup Inc owner) invites Alice to join Startup Inc as admin
+    -- Diana (Startup Inc owner) invites Alice to join Startup Inc as member
     ('a1eebc99-9c0b-4ef8-bb6d-6bb9bd380d01', 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'invite', 'e4eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'b7eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', NULL, 'member', 'pending', 'We would love to have you on our team!', NULL, NULL),
     -- Alice (Acme Corp owner) invites Diana to join Acme Corp as member
     ('a2eebc99-9c0b-4ef8-bb6d-6bb9bd380d02', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'invite', 'b7eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', 'e4eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', NULL, 'member', 'pending', NULL, NULL, NULL),

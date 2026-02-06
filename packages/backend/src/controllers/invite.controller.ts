@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { inviteService } from "../services/invite.service.js";
 import { createInviteSchema } from "../validators/invite.schema.js";
-import { ValidationError } from "../utils/errors.js";
+import { ValidationError, ForbiddenError, UnauthorizedError } from "../utils/errors.js";
 import { sendSuccess, sendError } from "../utils/response.js";
 import "../types/express.js";
 
@@ -15,8 +15,13 @@ export async function create(req: Request, res: Response): Promise<void> {
     if (!orgId) {
       throw new ValidationError("Organization not selected");
     }
+    if (req.params.orgId && req.params.orgId !== orgId) {
+      throw new ForbiddenError(
+        "Organization ID mismatch. You are currently browsing a different organization.",
+      );
+    }
     if (!invitedBy) {
-      throw new ValidationError("User not found in session");
+      throw new UnauthorizedError("User not found in session");
     }
 
     const parseResult = createInviteSchema.safeParse(req.body);
@@ -51,18 +56,21 @@ export async function list(req: Request, res: Response): Promise<void> {
     if (!orgId) {
       throw new ValidationError("Organization not selected");
     }
+    if (req.params.orgId && req.params.orgId !== orgId) {
+      throw new ForbiddenError(
+        "Organization ID mismatch. You are currently browsing a different organization.",
+      );
+    }
 
-    const status = req.query.status as string | undefined;
-    const invites = await inviteService.listOrgInvites(
-      orgId,
-      status as
-        | "pending"
-        | "accepted"
-        | "declined"
-        | "rejected"
-        | "revoked"
-        | undefined,
-    );
+    const validStatuses = ["pending", "accepted", "declined", "rejected", "revoked"] as const;
+    const statusParam = req.query.status as string | undefined;
+    if (statusParam && !validStatuses.includes(statusParam as typeof validStatuses[number])) {
+      throw new ValidationError(
+        `Invalid status. Must be one of: ${validStatuses.join(", ")}`,
+      );
+    }
+    const status = statusParam as typeof validStatuses[number] | undefined;
+    const invites = await inviteService.listOrgInvites(orgId, status);
 
     sendSuccess(res, { invites });
   } catch (error) {
@@ -81,8 +89,13 @@ export async function revoke(req: Request, res: Response): Promise<void> {
     if (!orgId) {
       throw new ValidationError("Organization not selected");
     }
+    if (req.params.orgId && req.params.orgId !== orgId) {
+      throw new ForbiddenError(
+        "Organization ID mismatch. You are currently browsing a different organization.",
+      );
+    }
     if (!revokedBy) {
-      throw new ValidationError("User not found in session");
+      throw new UnauthorizedError("User not found in session");
     }
     if (!inviteId) {
       throw new ValidationError("Invite ID is required");
@@ -102,7 +115,7 @@ export async function getMyInvites(req: Request, res: Response): Promise<void> {
   try {
     const userId = req.user?.id;
     if (!userId) {
-      throw new ValidationError("User not found in session");
+      throw new UnauthorizedError("User not found in session");
     }
 
     const invites = await inviteService.getMyInvites(userId);
@@ -121,7 +134,7 @@ export async function accept(req: Request, res: Response): Promise<void> {
     const inviteId = req.params.id;
 
     if (!userId) {
-      throw new ValidationError("User not found in session");
+      throw new UnauthorizedError("User not found in session");
     }
     if (!inviteId) {
       throw new ValidationError("Invite ID is required");
@@ -143,7 +156,7 @@ export async function decline(req: Request, res: Response): Promise<void> {
     const inviteId = req.params.id;
 
     if (!userId) {
-      throw new ValidationError("User not found in session");
+      throw new UnauthorizedError("User not found in session");
     }
     if (!inviteId) {
       throw new ValidationError("Invite ID is required");

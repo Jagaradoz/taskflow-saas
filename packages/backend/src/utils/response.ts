@@ -1,5 +1,6 @@
 import type { Response } from "express";
 import { AppError } from "./errors.js";
+import { logger } from "../config/logger.js";
 
 interface SuccessResponse<T> {
   status: "success";
@@ -33,7 +34,7 @@ export function sendError(
     return;
   }
 
-  console.error(`[${operation}] Unexpected error:`, error);
+  logger.error({ err: error, operation }, `[${operation}] Unexpected error`);
   const response: ErrorResponse = {
     status: "error",
     message: "Internal server error",

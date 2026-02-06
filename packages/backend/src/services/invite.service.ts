@@ -131,8 +131,9 @@ export const inviteService = {
       userId,
     );
 
-    // Invalidate members cache
+    // Invalidate members cache and user's cache
     await cacheService.del(cacheKeys.members(invite.orgId));
+    await cacheService.del(cacheKeys.user(userId));
 
     return membership;
   },

@@ -1,11 +1,11 @@
 info:
-  name: resolve-request
+  name: reject-request
   type: http
-  seq: 3
+  seq: 7
 
 http:
-  method: PATCH
-  url: http://localhost:5000/api/orgs/:orgId/requests/:requestId
+  method: POST
+  url: http://localhost:5000/api/orgs/:orgId/requests/:requestId/reject
   params:
     - name: orgId
       value: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
@@ -13,13 +13,6 @@ http:
     - name: requestId
       value: b2eebc99-9c0b-4ef8-bb6d-6bb9bd380d12
       type: path
-  body:
-    type: json
-    data: |-
-      {
-        "action": "approve",
-        "role": "member"
-      }
   auth: inherit
 
 settings:

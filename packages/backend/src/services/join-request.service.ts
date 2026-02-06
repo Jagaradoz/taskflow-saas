@@ -69,7 +69,7 @@ export const joinRequestService = {
   async approveRequest(
     requestId: string,
     approvedBy: string,
-    role: "member" = "member",
+    role: "owner" | "member" = "member",
   ) {
     const request = await membershipRequestRepository.findById(requestId);
     if (!request) {
@@ -113,8 +113,9 @@ export const joinRequestService = {
       approvedBy,
     );
 
-    // Invalidate members cache
+    // Invalidate members cache and user's cache
     await cacheService.del(cacheKeys.members(request.orgId));
+    await cacheService.del(cacheKeys.user(request.requesterId));
 
     return membership;
   },

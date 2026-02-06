@@ -14,16 +14,24 @@ router.get(
   "/orgs/:orgId/requests",
   authenticate,
   requireTenant,
-  authorize("owner", "admin"),
+  authorize("owner"),
   joinRequestController.list,
 );
 
-router.patch(
-  "/orgs/:orgId/requests/:id",
+router.post(
+  "/orgs/:orgId/requests/:id/approve",
   authenticate,
   requireTenant,
-  authorize("owner", "admin"),
-  joinRequestController.resolve,
+  authorize("owner"),
+  joinRequestController.approve,
+);
+
+router.post(
+  "/orgs/:orgId/requests/:id/reject",
+  authenticate,
+  requireTenant,
+  authorize("owner"),
+  joinRequestController.reject,
 );
 
 // User-scoped request routes

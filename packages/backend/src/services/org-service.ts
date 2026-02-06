@@ -4,7 +4,12 @@ import { nanoid } from "nanoid";
 // Local
 import { orgRepository } from "../repositories/org-repository.js";
 import { memberRepository } from "../repositories/member-repository.js";
-import { NotFoundError, ForbiddenError } from "../utils/errors.js";
+import {
+  NotFoundError,
+  ForbiddenError,
+  ValidationError,
+} from "../utils/errors.js";
+import { cacheService, cacheKeys } from "./cache-service.js";
 import type {
   CreateOrgInput,
   UpdateOrgInput,
@@ -20,6 +25,11 @@ function generateSlug(name: string): string {
 
 export const orgService = {
   async createOrg(userId: string, input: CreateOrgInput) {
+    const nameExists = await orgRepository.nameExists(input.name);
+    if (nameExists) {
+      throw new ValidationError("Organization name already exists");
+    }
+
     let slug = generateSlug(input.name);
 
     // Ensure unique slug
@@ -40,6 +50,9 @@ export const orgService = {
       orgId: org.id,
       role: "owner",
     });
+
+    // Invalidate user cache to ensure /me returns the new org
+    await cacheService.del(cacheKeys.user(userId));
 
     return org;
   },
@@ -62,6 +75,11 @@ export const orgService = {
   async updateOrg(orgId: string, input: UpdateOrgInput) {
     let slug: string | undefined;
     if (input.name) {
+      const nameExists = await orgRepository.nameExists(input.name, orgId);
+      if (nameExists) {
+        throw new ValidationError("Organization name already exists");
+      }
+
       slug = generateSlug(input.name);
       const exists = await orgRepository.slugExists(slug, orgId);
       if (exists) {

@@ -78,17 +78,23 @@ export const orgRepository = {
 
   async update(
     id: string,
-    data: { name?: string; slug?: string; description?: string },
+    data: { name?: string; slug?: string; description?: string | null },
   ): Promise<Organization | null> {
     const result = await pool.query<OrgRow>(
       `UPDATE organizations
        SET name = COALESCE($2, name),
            slug = COALESCE($3, slug),
-           description = COALESCE($4, description),
+           description = CASE WHEN $4::boolean THEN $5 ELSE description END,
            updated_at = NOW()
        WHERE id = $1
        RETURNING id, name, slug, description, created_at, updated_at`,
-      [id, data.name, data.slug, data.description],
+      [
+        id,
+        data.name,
+        data.slug,
+        data.description !== undefined,
+        data.description !== undefined ? data.description : null,
+      ],
     );
 
     const row = result.rows[0];
@@ -110,6 +116,16 @@ export const orgRepository = {
         ? "SELECT EXISTS(SELECT 1 FROM organizations WHERE slug = $1 AND id != $2) as exists"
         : "SELECT EXISTS(SELECT 1 FROM organizations WHERE slug = $1) as exists",
       excludeId ? [slug, excludeId] : [slug],
+    );
+    return result.rows[0]?.exists ?? false;
+  },
+
+  async nameExists(name: string, excludeId?: string): Promise<boolean> {
+    const result = await pool.query<{ exists: boolean }>(
+      excludeId
+        ? "SELECT EXISTS(SELECT 1 FROM organizations WHERE name = $1 AND id != $2) as exists"
+        : "SELECT EXISTS(SELECT 1 FROM organizations WHERE name = $1) as exists",
+      excludeId ? [name, excludeId] : [name],
     );
     return result.rows[0]?.exists ?? false;
   },

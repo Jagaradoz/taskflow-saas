@@ -13,7 +13,7 @@ interface MembershipRequestRow {
   invited_user_id: string | null;
   invited_by: string | null;
   requester_id: string | null;
-  role: "member";
+  role: "owner" | "member";
   status: MembershipRequestStatus;
   message: string | null;
   created_at: Date;
@@ -50,7 +50,7 @@ export interface CreateMembershipRequestData {
   invitedUserId?: string;
   invitedBy?: string;
   requesterId?: string;
-  role: "admin" | "member";
+  role: "owner" | "member";
   message?: string;
 }
 

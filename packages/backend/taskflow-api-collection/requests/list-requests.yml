@@ -13,7 +13,6 @@ http:
     - name: status
       value: pending
       type: query
-      enabled: false
   auth: inherit
 
 settings:

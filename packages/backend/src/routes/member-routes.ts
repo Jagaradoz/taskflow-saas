@@ -8,14 +8,6 @@ const router = Router();
 
 router.get("/", authenticate, requireTenant, memberController.list);
 
-router.patch(
-  "/:id",
-  authenticate,
-  requireTenant,
-  authorize("owner"),
-  memberController.update,
-);
-
 router.delete(
   "/:id",
   authenticate,

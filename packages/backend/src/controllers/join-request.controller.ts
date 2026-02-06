@@ -2,9 +2,9 @@ import type { Request, Response } from "express";
 import { joinRequestService } from "../services/join-request.service.js";
 import {
   createRequestSchema,
-  resolveRequestSchema,
+  approveRequestSchema,
 } from "../validators/join-request.schema.js";
-import { ValidationError, ForbiddenError } from "../utils/errors.js";
+import { ValidationError, ForbiddenError, UnauthorizedError } from "../utils/errors.js";
 import { sendSuccess, sendError } from "../utils/response.js";
 import "../types/express.js";
 
@@ -16,7 +16,7 @@ export async function create(req: Request, res: Response): Promise<void> {
     const slug = req.params.slug;
 
     if (!userId) {
-      throw new ValidationError("User not found in session");
+      throw new UnauthorizedError("User not found in session");
     }
     if (!slug) {
       throw new ValidationError("Organization slug is required");
@@ -63,17 +63,15 @@ export async function list(req: Request, res: Response): Promise<void> {
       );
     }
 
-    const status = req.query.status as string | undefined;
-    const requests = await joinRequestService.listOrgRequests(
-      sessionOrgId,
-      status as
-        | "pending"
-        | "accepted"
-        | "declined"
-        | "rejected"
-        | "revoked"
-        | undefined,
-    );
+    const validStatuses = ["pending", "accepted", "declined", "rejected", "revoked"] as const;
+    const statusParam = req.query.status as string | undefined;
+    if (statusParam && !validStatuses.includes(statusParam as typeof validStatuses[number])) {
+      throw new ValidationError(
+        `Invalid status. Must be one of: ${validStatuses.join(", ")}`,
+      );
+    }
+    const status = statusParam as typeof validStatuses[number] | undefined;
+    const requests = await joinRequestService.listOrgRequests(sessionOrgId, status);
 
     sendSuccess(res, { requests });
   } catch (error) {
@@ -81,9 +79,9 @@ export async function list(req: Request, res: Response): Promise<void> {
   }
 }
 
-// @route PATCH /api/orgs/:orgId/requests/:id
-// @desc  Resolve request (owner only)
-export async function resolve(req: Request, res: Response): Promise<void> {
+// @route POST /api/orgs/:orgId/requests/:id/approve
+// @desc  Approve request (owner only)
+export async function approve(req: Request, res: Response): Promise<void> {
   try {
     const orgId = req.currentOrgId;
     const resolvedBy = req.user?.id;
@@ -92,14 +90,19 @@ export async function resolve(req: Request, res: Response): Promise<void> {
     if (!orgId) {
       throw new ValidationError("Organization not selected");
     }
+    if (req.params.orgId && req.params.orgId !== orgId) {
+      throw new ForbiddenError(
+        "Organization ID mismatch. You are currently browsing a different organization.",
+      );
+    }
     if (!resolvedBy) {
-      throw new ValidationError("User not found in session");
+      throw new UnauthorizedError("User not found in session");
     }
     if (!requestId) {
       throw new ValidationError("Request ID is required");
     }
 
-    const parseResult = resolveRequestSchema.safeParse(req.body);
+    const parseResult = approveRequestSchema.safeParse(req.body);
     if (!parseResult.success) {
       throw new ValidationError(
         "Validation failed",
@@ -110,21 +113,46 @@ export async function resolve(req: Request, res: Response): Promise<void> {
       );
     }
 
-    const { action, role } = parseResult.data;
+    const { role } = parseResult.data;
 
-    if (action === "approve") {
-      const membership = await joinRequestService.approveRequest(
-        requestId,
-        resolvedBy,
-        role,
-      );
-      sendSuccess(res, { membership });
-    } else {
-      await joinRequestService.rejectRequest(requestId, resolvedBy);
-      sendSuccess(res, { message: "Request rejected successfully" });
-    }
+    const membership = await joinRequestService.approveRequest(
+      requestId,
+      resolvedBy,
+      role,
+    );
+    sendSuccess(res, { membership });
   } catch (error) {
-    sendError(error, res, "resolve");
+    sendError(error, res, "approve");
+  }
+}
+
+// @route POST /api/orgs/:orgId/requests/:id/reject
+// @desc  Reject request (owner only)
+export async function reject(req: Request, res: Response): Promise<void> {
+  try {
+    const orgId = req.currentOrgId;
+    const resolvedBy = req.user?.id;
+    const requestId = req.params.id;
+
+    if (!orgId) {
+      throw new ValidationError("Organization not selected");
+    }
+    if (req.params.orgId && req.params.orgId !== orgId) {
+      throw new ForbiddenError(
+        "Organization ID mismatch. You are currently browsing a different organization.",
+      );
+    }
+    if (!resolvedBy) {
+      throw new UnauthorizedError("User not found in session");
+    }
+    if (!requestId) {
+      throw new ValidationError("Request ID is required");
+    }
+
+    await joinRequestService.rejectRequest(requestId, resolvedBy);
+    sendSuccess(res, { message: "Request rejected successfully" });
+  } catch (error) {
+    sendError(error, res, "reject");
   }
 }
 
@@ -137,7 +165,7 @@ export async function getMyRequests(
   try {
     const userId = req.user?.id;
     if (!userId) {
-      throw new ValidationError("User not found in session");
+      throw new UnauthorizedError("User not found in session");
     }
 
     const requests = await joinRequestService.getMyRequests(userId);
@@ -156,7 +184,7 @@ export async function cancel(req: Request, res: Response): Promise<void> {
     const requestId = req.params.id;
 
     if (!userId) {
-      throw new ValidationError("User not found in session");
+      throw new UnauthorizedError("User not found in session");
     }
     if (!requestId) {
       throw new ValidationError("Request ID is required");
