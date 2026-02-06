@@ -117,6 +117,7 @@ export async function approve(req: Request, res: Response): Promise<void> {
 
     const membership = await joinRequestService.approveRequest(
       requestId,
+      orgId,
       resolvedBy,
       role,
     );
@@ -149,7 +150,7 @@ export async function reject(req: Request, res: Response): Promise<void> {
       throw new ValidationError("Request ID is required");
     }
 
-    await joinRequestService.rejectRequest(requestId, resolvedBy);
+    await joinRequestService.rejectRequest(requestId, orgId, resolvedBy);
     sendSuccess(res, { message: "Request rejected successfully" });
   } catch (error) {
     sendError(error, res, "reject");

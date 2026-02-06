@@ -45,6 +45,8 @@ export const taskService = {
   async updateTask(
     taskId: string,
     orgId: string,
+    userId: string,
+    userRole: MemberRole,
     updates: {
       title?: string;
       description?: string | null;
@@ -55,6 +57,11 @@ export const taskService = {
     const task = await taskRepository.findById(taskId, orgId);
     if (!task) {
       throw new NotFoundError("Task not found");
+    }
+
+    // Authorization: Owner can update any task, member can only update own tasks
+    if (userRole !== "owner" && task.createdBy !== userId) {
+      throw new ForbiddenError("You can only update tasks you created");
     }
 
     const updated = await taskRepository.update(taskId, orgId, updates);

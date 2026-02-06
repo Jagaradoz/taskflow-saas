@@ -3,6 +3,7 @@ import { membershipRequestRepository } from "../repositories/membership-request.
 import { memberRepository } from "../repositories/member-repository.js";
 import { orgRepository } from "../repositories/org-repository.js";
 import { cacheService, cacheKeys } from "./cache-service.js";
+import { withTransaction } from "../utils/transaction.js";
 import {
   NotFoundError,
   ForbiddenError,
@@ -68,12 +69,19 @@ export const joinRequestService = {
 
   async approveRequest(
     requestId: string,
+    orgId: string,
     approvedBy: string,
     role: "owner" | "member" = "member",
   ) {
     const request = await membershipRequestRepository.findById(requestId);
     if (!request) {
       throw new NotFoundError("Request not found");
+    }
+
+    if (request.orgId !== orgId) {
+      throw new ForbiddenError(
+        "Request does not belong to this organization",
+      );
     }
 
     if (request.type !== "request") {
@@ -99,31 +107,44 @@ export const joinRequestService = {
       );
     }
 
-    // Create membership
-    const membership = await memberRepository.create({
-      userId: request.requesterId,
-      orgId: request.orgId,
-      role,
+    // Create membership and update request status atomically
+    const membership = await withTransaction(async (client) => {
+      const newMembership = await memberRepository.create(
+        { userId: request.requesterId!, orgId: request.orgId, role },
+        client,
+      );
+
+      await membershipRequestRepository.updateStatus(
+        requestId,
+        "accepted",
+        approvedBy,
+        client,
+      );
+
+      return newMembership;
     });
 
-    // Update request status
-    await membershipRequestRepository.updateStatus(
-      requestId,
-      "accepted",
-      approvedBy,
-    );
-
-    // Invalidate members cache and user's cache
+    // Invalidate caches (outside transaction)
     await cacheService.del(cacheKeys.members(request.orgId));
     await cacheService.del(cacheKeys.user(request.requesterId));
 
     return membership;
   },
 
-  async rejectRequest(requestId: string, rejectedBy: string) {
+  async rejectRequest(
+    requestId: string,
+    orgId: string,
+    rejectedBy: string,
+  ) {
     const request = await membershipRequestRepository.findById(requestId);
     if (!request) {
       throw new NotFoundError("Request not found");
+    }
+
+    if (request.orgId !== orgId) {
+      throw new ForbiddenError(
+        "Request does not belong to this organization",
+      );
     }
 
     if (request.type !== "request") {

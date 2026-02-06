@@ -3,6 +3,7 @@ import type { Redis } from "ioredis";
 
 // Local
 import { redis } from "../config/redis.js";
+import { logger } from "../config/logger.js";
 
 const DEFAULT_TTL = 300; // 5 minutes
 
@@ -23,6 +24,7 @@ class CacheService {
     try {
       return JSON.parse(data) as T;
     } catch {
+      logger.warn({ key }, "Failed to parse cached value, treating as miss");
       return null;
     }
   }
@@ -51,15 +53,18 @@ class CacheService {
    */
   async delPattern(pattern: string): Promise<void> {
     const stream = this.client.scanStream({ match: pattern, count: 100 });
+    const pending: Promise<number>[] = [];
 
     stream.on("data", (keys: string[]) => {
       if (keys.length > 0) {
-        this.client.del(...keys);
+        pending.push(this.client.del(...keys));
       }
     });
 
     return new Promise((resolve, reject) => {
-      stream.on("end", resolve);
+      stream.on("end", () => {
+        Promise.all(pending).then(() => resolve(), reject);
+      });
       stream.on("error", reject);
     });
   }

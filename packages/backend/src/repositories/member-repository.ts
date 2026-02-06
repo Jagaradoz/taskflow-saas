@@ -1,5 +1,7 @@
 // Local
 import { pool } from "../config/db.js";
+import { AppError } from "../utils/errors.js";
+import type { Queryable } from "../utils/transaction.js";
 import type {
   Membership,
   MemberRole,
@@ -9,12 +11,16 @@ import type {
 } from "../types/membership.js";
 
 export const memberRepository = {
-  async create(data: {
-    userId: string;
-    orgId: string;
-    role: MemberRole;
-  }): Promise<Membership> {
-    const result = await pool.query<MembershipRow>(
+  async create(
+    data: {
+      userId: string;
+      orgId: string;
+      role: MemberRole;
+    },
+    client?: Queryable,
+  ): Promise<Membership> {
+    const db = client ?? pool;
+    const result = await db.query<MembershipRow>(
       `INSERT INTO memberships (user_id, org_id, role)
        VALUES ($1, $2, $3)
        RETURNING id, user_id, org_id, role, created_at`,
@@ -23,7 +29,7 @@ export const memberRepository = {
 
     const row = result.rows[0];
     if (!row) {
-      throw new Error("Failed to create membership");
+      throw new AppError("Failed to create membership");
     }
     return {
       id: row.id,

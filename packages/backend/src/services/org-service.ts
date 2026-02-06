@@ -10,17 +10,26 @@ import {
   ValidationError,
 } from "../utils/errors.js";
 import { cacheService, cacheKeys } from "./cache-service.js";
+import { withTransaction } from "../utils/transaction.js";
 import type {
   CreateOrgInput,
   UpdateOrgInput,
 } from "../validators/org.schema.js";
 
+const MAX_SLUG_RETRIES = 3;
+
 function generateSlug(name: string): string {
-  return name
+  const slug = name
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "")
     .slice(0, 50);
+
+  if (!slug) {
+    return nanoid(8);
+  }
+
+  return slug;
 }
 
 export const orgService = {
@@ -32,26 +41,29 @@ export const orgService = {
 
     let slug = generateSlug(input.name);
 
-    // Ensure unique slug
-    const exists = await orgRepository.slugExists(slug);
-    if (exists) {
-      slug = `${slug}-${nanoid(6)}`;
+    // Ensure unique slug with retry
+    for (let attempt = 0; attempt < MAX_SLUG_RETRIES; attempt++) {
+      const exists = await orgRepository.slugExists(slug);
+      if (!exists) break;
+      slug = `${generateSlug(input.name)}-${nanoid(6)}`;
     }
 
-    const org = await orgRepository.create({
-      name: input.name,
-      slug,
-      description: input.description,
+    // Create org and owner membership atomically
+    const org = await withTransaction(async (client) => {
+      const newOrg = await orgRepository.create(
+        { name: input.name, slug, description: input.description },
+        client,
+      );
+
+      await memberRepository.create(
+        { userId, orgId: newOrg.id, role: "owner" },
+        client,
+      );
+
+      return newOrg;
     });
 
-    // Create owner membership
-    await memberRepository.create({
-      userId,
-      orgId: org.id,
-      role: "owner",
-    });
-
-    // Invalidate user cache to ensure /me returns the new org
+    // Invalidate user cache (outside transaction)
     await cacheService.del(cacheKeys.user(userId));
 
     return org;

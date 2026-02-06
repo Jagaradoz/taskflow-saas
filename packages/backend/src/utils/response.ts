@@ -1,5 +1,5 @@
 import type { Response } from "express";
-import { AppError } from "./errors.js";
+import { AppError, ValidationError } from "./errors.js";
 import { logger } from "../config/logger.js";
 
 interface SuccessResponse<T> {
@@ -10,6 +10,7 @@ interface SuccessResponse<T> {
 interface ErrorResponse {
   status: "error";
   message: string;
+  errors?: Array<{ field: string; message: string }>;
 }
 
 export function sendSuccess<T>(res: Response, data: T, statusCode = 200): void {
@@ -30,6 +31,11 @@ export function sendError(
       status: "error",
       message: error.message,
     };
+
+    if (error instanceof ValidationError && error.errors) {
+      response.errors = error.errors;
+    }
+
     res.status(error.statusCode).json(response);
     return;
   }

@@ -3,6 +3,7 @@ import { membershipRequestRepository } from "../repositories/membership-request.
 import { memberRepository } from "../repositories/member-repository.js";
 import { userRepository } from "../repositories/user-repository.js";
 import { cacheService, cacheKeys } from "./cache-service.js";
+import { withTransaction } from "../utils/transaction.js";
 import {
   NotFoundError,
   ForbiddenError,
@@ -117,21 +118,24 @@ export const inviteService = {
       );
     }
 
-    // Create membership
-    const membership = await memberRepository.create({
-      userId,
-      orgId: invite.orgId,
-      role: "member",
+    // Create membership and update invite status atomically
+    const membership = await withTransaction(async (client) => {
+      const newMembership = await memberRepository.create(
+        { userId, orgId: invite.orgId, role: "member" },
+        client,
+      );
+
+      await membershipRequestRepository.updateStatus(
+        inviteId,
+        "accepted",
+        userId,
+        client,
+      );
+
+      return newMembership;
     });
 
-    // Update invite status
-    await membershipRequestRepository.updateStatus(
-      inviteId,
-      "accepted",
-      userId,
-    );
-
-    // Invalidate members cache and user's cache
+    // Invalidate caches (outside transaction)
     await cacheService.del(cacheKeys.members(invite.orgId));
     await cacheService.del(cacheKeys.user(userId));
 

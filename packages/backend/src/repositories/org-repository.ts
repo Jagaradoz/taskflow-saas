@@ -1,5 +1,7 @@
 // Local
 import { pool } from "../config/db.js";
+import { AppError } from "../utils/errors.js";
+import type { Queryable } from "../utils/transaction.js";
 import type { Organization, OrgRow } from "../types/organization.js";
 
 export const orgRepository = {
@@ -41,12 +43,16 @@ export const orgRepository = {
     };
   },
 
-  async create(data: {
-    name: string;
-    slug: string;
-    description?: string;
-  }): Promise<Organization> {
-    const result = await pool.query<OrgRow>(
+  async create(
+    data: {
+      name: string;
+      slug: string;
+      description?: string;
+    },
+    client?: Queryable,
+  ): Promise<Organization> {
+    const db = client ?? pool;
+    const result = await db.query<OrgRow>(
       `INSERT INTO organizations (name, slug, description)
        VALUES ($1, $2, $3)
        RETURNING id, name, slug, description, created_at, updated_at`,
@@ -55,7 +61,7 @@ export const orgRepository = {
 
     const row = result.rows[0];
     if (!row) {
-      throw new Error("Failed to create organization");
+      throw new AppError("Failed to create organization");
     }
     return {
       id: row.id,

@@ -1,5 +1,6 @@
 // Local
 import { pool } from "../config/db.js";
+import { AppError } from "../utils/errors.js";
 import type { Task, TaskRow } from "../types/task.js";
 
 function rowToTask(row: TaskRow): Task {
@@ -58,7 +59,7 @@ export const taskRepository = {
 
     const row = result.rows[0];
     if (!row) {
-      throw new Error("Failed to create task");
+      throw new AppError("Failed to create task");
     }
     return rowToTask(row);
   },

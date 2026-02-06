@@ -4,6 +4,7 @@ import "dotenv/config";
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 
 // Local
 import { env } from "./config/env.js";
@@ -34,8 +35,28 @@ app.use(
   }),
 );
 
+// Rate limiting
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 100,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: { status: "error", message: "Too many requests, please try again later" },
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 10,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: { status: "error", message: "Too many authentication attempts, please try again later" },
+});
+
 // Middlewares
 app.use(sessionMiddleware);
+app.use("/api", generalLimiter);
+app.use("/api/auth/login", authLimiter);
+app.use("/api/auth/register", authLimiter);
 
 // Endpoints
 app.use("/api/auth", authRoutes);
@@ -50,7 +71,13 @@ app.use(errorHandler);
 
 app.listen(env.PORT, async () => {
   logger.info("Server connected (PORT: %d)", env.PORT);
-  await pool.query("SELECT 1");
+  try {
+    await pool.query("SELECT 1");
+    logger.info("Database connection verified");
+  } catch (error) {
+    logger.error({ err: error }, "Database connection failed on startup");
+    process.exit(1);
+  }
 });
 
 export { app };

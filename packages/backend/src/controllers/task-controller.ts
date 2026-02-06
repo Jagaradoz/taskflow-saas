@@ -64,12 +64,21 @@ export async function create(req: Request, res: Response): Promise<void> {
 }
 
 // @route PATCH /api/tasks/:id
-// @desc  Update task (any member can update)
+// @desc  Update task (owner can update any, member can update own only)
 export async function update(req: Request, res: Response): Promise<void> {
   try {
     const orgId = req.currentOrgId;
+    const userId = req.user?.id;
+    const userRole = req.membership?.role;
+
     if (!orgId) {
       throw new ValidationError("Organization not selected");
+    }
+    if (!userId) {
+      throw new ValidationError("User not found in session");
+    }
+    if (!userRole) {
+      throw new ValidationError("User role not found");
     }
 
     const taskId = req.params.id;
@@ -88,7 +97,13 @@ export async function update(req: Request, res: Response): Promise<void> {
       );
     }
 
-    const task = await taskService.updateTask(taskId, orgId, parseResult.data);
+    const task = await taskService.updateTask(
+      taskId,
+      orgId,
+      userId,
+      userRole,
+      parseResult.data,
+    );
 
     sendSuccess(res, { task });
   } catch (error) {

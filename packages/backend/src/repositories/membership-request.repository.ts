@@ -1,5 +1,7 @@
 // Local
 import { pool } from "../config/db.js";
+import { AppError, ValidationError } from "../utils/errors.js";
+import type { Queryable } from "../utils/transaction.js";
 import type {
   MembershipRequest,
   MembershipRequestType,
@@ -50,6 +52,15 @@ function mapRowToMembershipRequestWithUser(
   }
 
   return result;
+}
+
+function isUniqueViolation(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    (error as { code: string }).code === "23505"
+  );
 }
 
 export const membershipRequestRepository = {
@@ -170,37 +181,52 @@ export const membershipRequestRepository = {
     return result.rows.map(mapRowToMembershipRequestWithUser);
   },
 
-  async create(data: CreateMembershipRequestData): Promise<MembershipRequest> {
-    const result = await pool.query<MembershipRequestRow>(
-      `INSERT INTO membership_requests (org_id, type, invited_user_id, invited_by, requester_id, role, message)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
-       RETURNING id, org_id, type, invited_user_id, invited_by, requester_id,
-                 role, status, message, created_at, updated_at, resolved_at, resolved_by`,
-      [
-        data.orgId,
-        data.type,
-        data.invitedUserId || null,
-        data.invitedBy || null,
-        data.requesterId || null,
-        data.role,
-        data.message || null,
-      ],
-    );
+  async create(
+    data: CreateMembershipRequestData,
+    client?: Queryable,
+  ): Promise<MembershipRequest> {
+    const db = client ?? pool;
+    try {
+      const result = await db.query<MembershipRequestRow>(
+        `INSERT INTO membership_requests (org_id, type, invited_user_id, invited_by, requester_id, role, message)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
+         RETURNING id, org_id, type, invited_user_id, invited_by, requester_id,
+                   role, status, message, created_at, updated_at, resolved_at, resolved_by`,
+        [
+          data.orgId,
+          data.type,
+          data.invitedUserId || null,
+          data.invitedBy || null,
+          data.requesterId || null,
+          data.role,
+          data.message || null,
+        ],
+      );
 
-    const row = result.rows[0];
-    if (!row) {
-      throw new Error("Failed to create membership request");
+      const row = result.rows[0];
+      if (!row) {
+        throw new AppError("Failed to create membership request");
+      }
+
+      return mapRowToMembershipRequest(row);
+    } catch (error) {
+      if (isUniqueViolation(error)) {
+        throw new ValidationError(
+          "A pending request or invite already exists for this user and organization",
+        );
+      }
+      throw error;
     }
-
-    return mapRowToMembershipRequest(row);
   },
 
   async updateStatus(
     id: string,
     status: MembershipRequestStatus,
     resolvedBy: string,
+    client?: Queryable,
   ): Promise<MembershipRequest | null> {
-    const result = await pool.query<MembershipRequestRow>(
+    const db = client ?? pool;
+    const result = await db.query<MembershipRequestRow>(
       `UPDATE membership_requests
        SET status = $2, resolved_by = $3, resolved_at = NOW(), updated_at = NOW()
        WHERE id = $1
