@@ -16,10 +16,6 @@ pool.on("error", (err) => {
   logger.error("Database pool error: %s", err.message);
 });
 
-pool.on("connect", () => {
-  logger.info("Database connected");
-});
-
 export const closeDatabase = async (): Promise<void> => {
   await pool.end();
   logger.info("Database connection closed");

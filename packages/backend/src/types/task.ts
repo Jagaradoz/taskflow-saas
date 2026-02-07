@@ -2,6 +2,7 @@ export interface Task {
   id: string;
   orgId: string;
   createdBy: string | null;
+  creatorName: string | null;
   title: string;
   description: string | null;
   isDone: boolean;
@@ -14,6 +15,7 @@ export interface TaskRow {
   id: string;
   org_id: string;
   created_by: string | null;
+  creator_name: string | null;
   title: string;
   description: string | null;
   is_done: boolean;

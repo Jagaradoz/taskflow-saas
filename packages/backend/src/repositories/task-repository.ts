@@ -8,6 +8,7 @@ function rowToTask(row: TaskRow): Task {
     id: row.id,
     orgId: row.org_id,
     createdBy: row.created_by,
+    creatorName: row.creator_name,
     title: row.title,
     description: row.description,
     isDone: row.is_done,
@@ -20,10 +21,12 @@ function rowToTask(row: TaskRow): Task {
 export const taskRepository = {
   async findByOrgId(orgId: string): Promise<Task[]> {
     const result = await pool.query<TaskRow>(
-      `SELECT id, org_id, created_by, title, description, is_done, is_pinned, created_at, updated_at
-       FROM tasks
-       WHERE org_id = $1
-       ORDER BY is_pinned DESC, created_at DESC`,
+      `SELECT t.id, t.org_id, t.created_by, u.name AS creator_name,
+              t.title, t.description, t.is_done, t.is_pinned, t.created_at, t.updated_at
+       FROM tasks t
+       LEFT JOIN users u ON u.id = t.created_by
+       WHERE t.org_id = $1
+       ORDER BY t.is_pinned DESC, t.created_at DESC`,
       [orgId],
     );
 
@@ -32,9 +35,11 @@ export const taskRepository = {
 
   async findById(id: string, orgId: string): Promise<Task | null> {
     const result = await pool.query<TaskRow>(
-      `SELECT id, org_id, created_by, title, description, is_done, is_pinned, created_at, updated_at
-       FROM tasks
-       WHERE id = $1 AND org_id = $2`,
+      `SELECT t.id, t.org_id, t.created_by, u.name AS creator_name,
+              t.title, t.description, t.is_done, t.is_pinned, t.created_at, t.updated_at
+       FROM tasks t
+       LEFT JOIN users u ON u.id = t.created_by
+       WHERE t.id = $1 AND t.org_id = $2`,
       [id, orgId],
     );
 
@@ -51,9 +56,14 @@ export const taskRepository = {
     description?: string | null;
   }): Promise<Task> {
     const result = await pool.query<TaskRow>(
-      `INSERT INTO tasks (org_id, created_by, title, description)
-       VALUES ($1, $2, $3, $4)
-       RETURNING id, org_id, created_by, title, description, is_done, is_pinned, created_at, updated_at`,
+      `WITH new_task AS (
+         INSERT INTO tasks (org_id, created_by, title, description)
+         VALUES ($1, $2, $3, $4)
+         RETURNING id, org_id, created_by, title, description, is_done, is_pinned, created_at, updated_at
+       )
+       SELECT nt.*, u.name AS creator_name
+       FROM new_task nt
+       LEFT JOIN users u ON u.id = nt.created_by`,
       [data.orgId, data.createdBy, data.title, data.description ?? null],
     );
 
@@ -98,10 +108,15 @@ export const taskRepository = {
     values.push(id, orgId);
 
     const result = await pool.query<TaskRow>(
-      `UPDATE tasks
-       SET ${updates.join(", ")}
-       WHERE id = $${paramIndex++} AND org_id = $${paramIndex}
-       RETURNING id, org_id, created_by, title, description, is_done, is_pinned, created_at, updated_at`,
+      `WITH updated_task AS (
+         UPDATE tasks
+         SET ${updates.join(", ")}
+         WHERE id = $${paramIndex++} AND org_id = $${paramIndex}
+         RETURNING id, org_id, created_by, title, description, is_done, is_pinned, created_at, updated_at
+       )
+       SELECT ut.*, u.name AS creator_name
+       FROM updated_task ut
+       LEFT JOIN users u ON u.id = ut.created_by`,
       values,
     );
 

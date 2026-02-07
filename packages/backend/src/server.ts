@@ -41,15 +41,21 @@ const generalLimiter = rateLimit({
   limit: 100,
   standardHeaders: "draft-7",
   legacyHeaders: false,
-  message: { status: "error", message: "Too many requests, please try again later" },
+  message: {
+    status: "error",
+    message: "Too many requests, please try again later",
+  },
 });
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 10,
+  limit: env.NODE_ENV === "production" ? 10 : 100,
   standardHeaders: "draft-7",
   legacyHeaders: false,
-  message: { status: "error", message: "Too many authentication attempts, please try again later" },
+  message: {
+    status: "error",
+    message: "Too many authentication attempts, please try again later",
+  },
 });
 
 // Middlewares
@@ -73,7 +79,7 @@ app.listen(env.PORT, async () => {
   logger.info("Server connected (PORT: %d)", env.PORT);
   try {
     await pool.query("SELECT 1");
-    logger.info("Database connection verified");
+    logger.info("Database connected");
   } catch (error) {
     logger.error({ err: error }, "Database connection failed on startup");
     process.exit(1);
