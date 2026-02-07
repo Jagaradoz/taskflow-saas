@@ -1,0 +1,19 @@
+info:
+  name: cancel-request
+  type: http
+  seq: 5
+
+http:
+  method: DELETE
+  url: http://localhost:5000/api/me/requests/:id
+  params:
+    - name: id
+      value: b1eebc99-9c0b-4ef8-bb6d-6bb9bd380d11
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

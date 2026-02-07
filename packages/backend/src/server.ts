@@ -4,6 +4,7 @@ import "dotenv/config";
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 
 // Local
 import { env } from "./config/env.js";
@@ -18,6 +19,8 @@ import { memberRoutes } from "./routes/member-routes.js";
 import { orgRoutes } from "./routes/org-routes.js";
 import { systemRoutes } from "./routes/system-routes.js";
 import { taskRoutes } from "./routes/task-routes.js";
+import { inviteRoutes } from "./routes/invite.routes.js";
+import { joinRequestRoutes } from "./routes/join-request.routes.js";
 
 const app = express();
 
@@ -32,8 +35,34 @@ app.use(
   }),
 );
 
+// Rate limiting
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 100,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: {
+    status: "error",
+    message: "Too many requests, please try again later",
+  },
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: env.NODE_ENV === "production" ? 10 : 100,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: {
+    status: "error",
+    message: "Too many authentication attempts, please try again later",
+  },
+});
+
 // Middlewares
 app.use(sessionMiddleware);
+app.use("/api", generalLimiter);
+app.use("/api/auth/login", authLimiter);
+app.use("/api/auth/register", authLimiter);
 
 // Endpoints
 app.use("/api/auth", authRoutes);
@@ -41,12 +70,20 @@ app.use("/api/orgs", orgRoutes);
 app.use("/api/members", memberRoutes);
 app.use("/api/system", systemRoutes);
 app.use("/api/tasks", taskRoutes);
+app.use("/api", inviteRoutes);
+app.use("/api", joinRequestRoutes);
 
 app.use(errorHandler);
 
 app.listen(env.PORT, async () => {
   logger.info("Server connected (PORT: %d)", env.PORT);
-  await pool.query("SELECT 1");
+  try {
+    await pool.query("SELECT 1");
+    logger.info("Database connected");
+  } catch (error) {
+    logger.error({ err: error }, "Database connection failed on startup");
+    process.exit(1);
+  }
 });
 
 export { app };

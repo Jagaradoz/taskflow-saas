@@ -8,7 +8,13 @@ import { logger } from "./logger.js";
 export const redis = new Redis(env.REDIS_URL, {
   maxRetriesPerRequest: 3,
   retryStrategy: (times) => {
-    if (times > 3) return null;
+    if (times > 3) {
+      logger.error(
+        "Redis retry limit reached (%d attempts). Connection unavailable.",
+        times,
+      );
+      return null;
+    }
     return Math.min(times * 100, 2000);
   },
 });

@@ -33,9 +33,13 @@ coverage/
 *.tgz
 .pnpm-store/
 
-# AI tooling (local only)
+# AI tooling
 .agent/
 .claude/
 
 # Documentations
 /docs
+
+# Markdown files
+*.md
+!README.md

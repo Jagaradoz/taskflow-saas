@@ -1,39 +1,26 @@
 // Local
 import { pool } from "../config/db.js";
-import type { Membership, MemberRole } from "../types/index.js";
-
-interface MembershipRow {
-  id: string;
-  user_id: string;
-  org_id: string;
-  role: MemberRole;
-  created_at: Date;
-}
-
-interface MemberWithUserRow {
-  id: string;
-  user_id: string;
-  org_id: string;
-  role: MemberRole;
-  created_at: Date;
-  user_email: string;
-  user_name: string;
-}
-
-export interface MemberWithUser extends Membership {
-  user: {
-    email: string;
-    name: string;
-  };
-}
+import { AppError } from "../utils/errors.js";
+import type { Queryable } from "../utils/transaction.js";
+import type {
+  Membership,
+  MemberRole,
+  MembershipRow,
+  MemberWithUserRow,
+  MemberWithUser,
+} from "../types/membership.js";
 
 export const memberRepository = {
-  async create(data: {
-    userId: string;
-    orgId: string;
-    role: MemberRole;
-  }): Promise<Membership> {
-    const result = await pool.query<MembershipRow>(
+  async create(
+    data: {
+      userId: string;
+      orgId: string;
+      role: MemberRole;
+    },
+    client?: Queryable,
+  ): Promise<Membership> {
+    const db = client ?? pool;
+    const result = await db.query<MembershipRow>(
       `INSERT INTO memberships (user_id, org_id, role)
        VALUES ($1, $2, $3)
        RETURNING id, user_id, org_id, role, created_at`,
@@ -42,7 +29,7 @@ export const memberRepository = {
 
     const row = result.rows[0];
     if (!row) {
-      throw new Error("Failed to create membership");
+      throw new AppError("Failed to create membership");
     }
     return {
       id: row.id,

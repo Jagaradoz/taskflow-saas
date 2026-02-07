@@ -4,7 +4,8 @@ import type { Request, Response, NextFunction } from "express";
 // Local
 import { userRepository } from "../repositories/user-repository.js";
 import { UnauthorizedError } from "../utils/errors.js";
-import type { RequestUser } from "../types/index.js";
+import { logger } from "../config/logger.js";
+import type { RequestUser } from "../types/express.js";
 import "../types/express.js";
 
 export const authenticate = async (
@@ -21,7 +22,11 @@ export const authenticate = async (
 
     const user = await userRepository.findById(userId);
     if (!user) {
-      req.session.destroy(() => {});
+      req.session.destroy((err) => {
+        if (err) {
+          logger.error({ err }, "Failed to destroy session for missing user");
+        }
+      });
       throw new UnauthorizedError("User not found");
     }
 

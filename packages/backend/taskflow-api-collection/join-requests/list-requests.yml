@@ -1,0 +1,22 @@
+info:
+  name: list-requests
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: http://localhost:5000/api/orgs/:orgId/requests
+  params:
+    - name: orgId
+      value: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
+      type: path
+    - name: status
+      value: pending
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -4,7 +4,7 @@ import type { Request, Response, NextFunction } from "express";
 // Local
 import { memberRepository } from "../repositories/member-repository.js";
 import { ForbiddenError } from "../utils/errors.js";
-import type { RequestMembership } from "../types/index.js";
+import type { RequestMembership } from "../types/express.js";
 import "../types/express.js";
 
 export const requireTenant = async (

@@ -2,7 +2,6 @@
 import { memberRepository } from "../repositories/member-repository.js";
 import { NotFoundError, ForbiddenError } from "../utils/errors.js";
 import { cacheService, cacheKeys, cacheTTL } from "./cache-service.js";
-import type { MemberRole } from "../types/index.js";
 
 export const memberService = {
   async listMembers(orgId: string) {
@@ -21,42 +20,6 @@ export const memberService = {
     await cacheService.set(cacheKey, members, cacheTTL.members);
 
     return members;
-  },
-
-  async updateRole(
-    membershipId: string,
-    currentOrgId: string,
-    newRole: MemberRole,
-  ) {
-    const membership = await memberRepository.findById(membershipId);
-    if (!membership) {
-      throw new NotFoundError("Membership not found");
-    }
-
-    if (membership.orgId !== currentOrgId) {
-      throw new ForbiddenError(
-        "Membership does not belong to current organization",
-      );
-    }
-
-    // Prevent demoting the last owner
-    if (membership.role === "owner" && newRole === "member") {
-      const ownerCount =
-        await memberRepository.countOwnersByOrgId(currentOrgId);
-      if (ownerCount <= 1) {
-        throw new ForbiddenError("Cannot demote the last owner");
-      }
-    }
-
-    const updated = await memberRepository.updateRole(membershipId, newRole);
-    if (!updated) {
-      throw new NotFoundError("Membership not found");
-    }
-
-    // Invalidate members cache
-    await cacheService.del(cacheKeys.members(currentOrgId));
-
-    return updated;
   },
 
   async removeMember(
@@ -94,8 +57,9 @@ export const memberService = {
       throw new NotFoundError("Membership not found");
     }
 
-    // Invalidate members cache
+    // Invalidate members cache and removed user's cache
     await cacheService.del(cacheKeys.members(currentOrgId));
+    await cacheService.del(cacheKeys.user(membership.userId));
 
     return true;
   },

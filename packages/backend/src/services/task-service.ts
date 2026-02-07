@@ -2,7 +2,7 @@
 import { taskRepository } from "../repositories/task-repository.js";
 import { NotFoundError, ForbiddenError } from "../utils/errors.js";
 import { cacheService, cacheKeys, cacheTTL } from "./cache-service.js";
-import type { MemberRole } from "../types/index.js";
+import type { MemberRole } from "../types/membership.js";
 
 export const taskService = {
   async listTasks(orgId: string) {
@@ -23,11 +23,17 @@ export const taskService = {
     return tasks;
   },
 
-  async createTask(orgId: string, userId: string, title: string) {
+  async createTask(
+    orgId: string,
+    userId: string,
+    title: string,
+    description?: string | null,
+  ) {
     const task = await taskRepository.create({
       orgId,
       createdBy: userId,
       title,
+      description,
     });
 
     // Invalidate cache
@@ -39,11 +45,23 @@ export const taskService = {
   async updateTask(
     taskId: string,
     orgId: string,
-    updates: { title?: string; isDone?: boolean; isPinned?: boolean },
+    userId: string,
+    userRole: MemberRole,
+    updates: {
+      title?: string;
+      description?: string | null;
+      isDone?: boolean;
+      isPinned?: boolean;
+    },
   ) {
     const task = await taskRepository.findById(taskId, orgId);
     if (!task) {
       throw new NotFoundError("Task not found");
+    }
+
+    // Authorization: Owner can update any task, member can only update own tasks
+    if (userRole !== "owner" && task.createdBy !== userId) {
+      throw new ForbiddenError("You can only update tasks you created");
     }
 
     const updated = await taskRepository.update(taskId, orgId, updates);

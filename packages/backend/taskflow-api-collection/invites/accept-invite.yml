@@ -1,0 +1,19 @@
+info:
+  name: accept-invite
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: http://localhost:5000/api/me/invites/:id/accept
+  params:
+    - name: id
+      value: a1eebc99-9c0b-4ef8-bb6d-6bb9bd380d01
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

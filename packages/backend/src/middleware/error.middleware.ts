@@ -5,18 +5,11 @@ import type {
   Request,
   Response,
 } from "express";
-import pino from "pino";
 
 // Local
 import { env } from "../config/env.js";
+import { logger } from "../config/logger.js";
 import { AppError, ValidationError } from "../utils/errors.js";
-
-const logger = pino({
-  transport: {
-    target: "pino-pretty",
-    options: { colorize: true },
-  },
-});
 
 export const errorHandler: ErrorRequestHandler = (
   err: Error,

@@ -10,10 +10,10 @@
     "lint": "eslint src/",
     "test": "vitest run",
     "test:watch": "vitest",
-    "db:migrate": "tsx src/db/migrate.ts",
+    "db:init": "tsx src/db/migrate.ts",
     "db:seed": "tsx src/db/seed.ts",
-    "db:reset": "tsx src/db/reset.ts",
-    "db:setup": "npm run db:migrate && npm run db:seed"
+    "db:drop": "tsx src/db/reset.ts",
+    "db:setup": "npm run db:drop && npm run db:init && npm run db:seed"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
@@ -21,6 +21,7 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^4.21.0",
+    "express-rate-limit": "^8.2.1",
     "express-session": "^1.18.0",
     "helmet": "^7.1.0",
     "ioredis": "^5.4.1",

@@ -1,0 +1,22 @@
+info:
+  name: reject-request
+  type: http
+  seq: 7
+
+http:
+  method: POST
+  url: http://localhost:5000/api/orgs/:orgId/requests/:id/reject
+  params:
+    - name: orgId
+      value: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
+      type: path
+    - name: id
+      value: b2eebc99-9c0b-4ef8-bb6d-6bb9bd380d12
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

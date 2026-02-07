@@ -14,10 +14,7 @@ const envSchema = z.object({
   REDIS_URL: z.string().url().default("redis://localhost:6379"),
   SESSION_SECRET: z
     .string()
-    .min(1)
-    .default(
-      "cf2c588a47dfb149b60ba20236ff881e3045a2653b106e349a44caa60311e173",
-    ),
+    .min(1, "SESSION_SECRET environment variable is required"),
   SESSION_MAX_AGE: z.coerce.number().positive().default(86400000),
 });
 

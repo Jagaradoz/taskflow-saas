@@ -3,7 +3,7 @@ import type { Request, Response, NextFunction } from "express";
 
 // Local
 import { ForbiddenError } from "../utils/errors.js";
-import type { MemberRole } from "../types/index.js";
+import type { MemberRole } from "../types/membership.js";
 import "../types/express.js";
 
 export const authorize = (...allowedRoles: MemberRole[]) => {

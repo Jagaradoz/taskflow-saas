@@ -8,13 +8,14 @@ http:
   url: http://localhost:5000/api/tasks/:id
   params:
     - name: id
-      value: ""
+      value: 2d88545d-a262-4ac2-bdf8-19dfab08152b
       type: path
   body:
     type: json
     data: |-
       {
         "title": "Updated task",
+        "description": "Updated description",
         "isDone": false,
         "isPinned": false
       }

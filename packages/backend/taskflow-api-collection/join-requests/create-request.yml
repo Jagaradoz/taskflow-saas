@@ -1,20 +1,20 @@
 info:
-  name: update-member
+  name: create-request
   type: http
-  seq: 2
+  seq: 1
 
 http:
-  method: PATCH
-  url: http://localhost:5000/api/members/:id
+  method: POST
+  url: http://localhost:5000/api/orgs/:slug/requests
   params:
-    - name: id
-      value: ""
+    - name: slug
+      value: acme-corp
       type: path
   body:
     type: json
     data: |-
       {
-        "role": "member"
+        "message": "I would like to join your organization!"
       }
   auth: inherit
 

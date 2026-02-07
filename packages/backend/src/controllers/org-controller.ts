@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { orgService } from "../services/org-service.js";
 import { createOrgSchema, updateOrgSchema } from "../validators/org.schema.js";
-import { ValidationError } from "../utils/errors.js";
+import { ValidationError, ForbiddenError, UnauthorizedError } from "../utils/errors.js";
 import { sendSuccess, sendError } from "../utils/response.js";
 import "../types/express.js";
 
@@ -11,7 +11,7 @@ export async function create(req: Request, res: Response): Promise<void> {
   try {
     const userId = req.user?.id;
     if (!userId) {
-      throw new ValidationError("User not found in session");
+      throw new UnauthorizedError("User not found in session");
     }
 
     const parseResult = createOrgSchema.safeParse(req.body);
@@ -42,7 +42,7 @@ export async function getById(req: Request, res: Response): Promise<void> {
   try {
     const userId = req.user?.id;
     if (!userId) {
-      throw new ValidationError("User not found in session");
+      throw new UnauthorizedError("User not found in session");
     }
 
     const orgId = req.params.id;
@@ -65,6 +65,13 @@ export async function update(req: Request, res: Response): Promise<void> {
     const orgId = req.params.id;
     if (!orgId) {
       throw new ValidationError("Organization ID is required");
+    }
+
+    // Ensure the URL org matches the session org to prevent cross-org updates
+    if (orgId !== req.currentOrgId) {
+      throw new ForbiddenError(
+        "Organization ID mismatch. You can only update your current organization.",
+      );
     }
 
     const parseResult = updateOrgSchema.safeParse(req.body);
@@ -92,7 +99,7 @@ export async function switchOrg(req: Request, res: Response): Promise<void> {
   try {
     const userId = req.user?.id;
     if (!userId) {
-      throw new ValidationError("User not found in session");
+      throw new UnauthorizedError("User not found in session");
     }
 
     const orgId = req.params.id;

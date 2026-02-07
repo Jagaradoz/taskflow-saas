@@ -1,14 +1,14 @@
 info:
   name: remove-member
   type: http
-  seq: 3
+  seq: 2
 
 http:
   method: DELETE
   url: http://localhost:5000/api/members/:id
   params:
     - name: id
-      value: ""
+      value: PASTE_MEMBERSHIP_ID_FROM_list-members_RESPONSE
       type: path
   auth: inherit
 
