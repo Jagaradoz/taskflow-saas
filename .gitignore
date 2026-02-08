@@ -29,6 +29,9 @@ Thumbs.db
 # Testing
 coverage/
 
+# Design files
+*.pen
+
 # Misc
 *.tgz
 .pnpm-store/
