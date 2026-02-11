@@ -37,11 +37,14 @@ coverage/
 .pnpm-store/
 
 # AI tooling
-.agent/
+.agent-skills/
 .claude/
 
 # Documentations
 /docs
+
+# Designs
+/designs
 
 # Markdown files
 *.md
