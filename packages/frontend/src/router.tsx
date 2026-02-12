@@ -3,28 +3,17 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import { SuspenseLoader } from "@/components/SuspenseLoader";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { GuestRoute } from "@/components/GuestRoute";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { NoOrgState } from "@/features/orgs/components/NoOrgState";
 
 // Lazy-loaded pages
 const LoginPage = lazy(() => import("@/features/auth/pages/LoginPage"));
 const RegisterPage = lazy(() => import("@/features/auth/pages/RegisterPage"));
-
-/**
- * Temporary dashboard placeholder until Phase 4 adds the real layout.
- */
-function DashboardPlaceholder(): JSX.Element {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-bg-page">
-      <div className="text-center">
-        <h1 className="mb-2 font-heading text-4xl font-bold text-white">
-          TaskFlow
-        </h1>
-        <p className="font-mono text-sm text-gray-500">
-          Dashboard coming in Phase 4
-        </p>
-      </div>
-    </div>
-  );
-}
+const TasksPage = lazy(() => import("@/features/tasks/pages/TasksPage"));
+const MembersPage = lazy(() => import("@/features/members/pages/MembersPage"));
+const SettingsPage = lazy(() => import("@/features/orgs/pages/SettingsPage"));
+const OrgInvitesPage = lazy(() => import("@/features/invites/pages/OrgInvitesPage"));
+const MyInvitesPage = lazy(() => import("@/features/invites/pages/MyInvitesPage"));
 
 export const router = createBrowserRouter([
   // Guest-only routes (redirect to / if logged in)
@@ -64,7 +53,53 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <DashboardPlaceholder />,
+        element: <DashboardLayout />,
+        children: [
+          {
+            index: true,
+            element: (
+              <SuspenseLoader>
+                <TasksPage />
+              </SuspenseLoader>
+            ),
+          },
+          {
+            path: "members",
+            element: (
+              <SuspenseLoader>
+                <MembersPage />
+              </SuspenseLoader>
+            ),
+          },
+          {
+            path: "settings",
+            element: (
+              <SuspenseLoader>
+                <SettingsPage />
+              </SuspenseLoader>
+            ),
+          },
+          {
+            path: "invites",
+            element: (
+              <SuspenseLoader>
+                <OrgInvitesPage />
+              </SuspenseLoader>
+            ),
+          },
+          {
+            path: "me/invites",
+            element: (
+              <SuspenseLoader>
+                <MyInvitesPage />
+              </SuspenseLoader>
+            ),
+          },
+        ],
+      },
+      {
+        path: "/no-org",
+        element: <NoOrgState />,
       },
     ],
   },
