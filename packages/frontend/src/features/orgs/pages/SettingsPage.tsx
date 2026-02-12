@@ -1,17 +1,22 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import {
-  TextField,
-  Button,
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
 } from '@mui/material';
 import { AlertTriangle } from 'lucide-react';
 import { useDashboardContext } from '../../../hooks/useDashboardContext';
 import { getAuthState } from '../../../mock/auth';
 import { getOrganization, updateOrganization, deleteOrganization } from '../../../mock/organizations';
 import { getMembersByOrg } from '../../../mock/members';
+
+function generateSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 50);
+}
 
 const SettingsPage: React.FC = () => {
   const { currentOrgId } = useDashboardContext();
@@ -25,6 +30,9 @@ const SettingsPage: React.FC = () => {
   const [name, setName] = useState(org?.name ?? '');
   const [description, setDescription] = useState(org?.description ?? '');
   const [saved, setSaved] = useState(false);
+
+  const nameChanged = name.trim() !== (org?.name ?? '');
+  const slugPreview = useMemo(() => generateSlug(name.trim()), [name]);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [confirmText, setConfirmText] = useState('');
 
@@ -69,30 +77,44 @@ const SettingsPage: React.FC = () => {
           General
         </h2>
 
-        <div className="flex flex-col gap-4">
-          <TextField
-            label="Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            disabled={!isOwner}
-            fullWidth
-          />
-          <TextField
-            label="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            disabled={!isOwner}
-            multiline
-            minRows={3}
-            fullWidth
-          />
-          <TextField
-            label="Slug"
-            value={org.slug}
-            disabled
-            fullWidth
-            helperText="The slug cannot be changed"
-          />
+        <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-2">
+            <label className="font-mono text-[11px] font-semibold uppercase tracking-wide text-gray-500">
+              NAME
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              disabled={!isOwner}
+              className="h-11 w-full border border-border bg-bg-elevated px-3.5 font-mono text-[13px] font-medium text-white placeholder:text-gray-400 focus:border-green-primary focus:outline-none disabled:cursor-not-allowed disabled:text-gray-500 disabled:opacity-60"
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="font-mono text-[11px] font-semibold uppercase tracking-wide text-gray-500">
+              DESCRIPTION
+            </label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              disabled={!isOwner}
+              rows={3}
+              className="w-full resize-none border border-border bg-bg-elevated px-3.5 py-3 font-mono text-[13px] font-medium text-white placeholder:text-gray-400 focus:border-green-primary focus:outline-none disabled:cursor-not-allowed disabled:text-gray-500 disabled:opacity-60"
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="font-mono text-[11px] font-semibold uppercase tracking-wide text-gray-500">
+              SLUG
+            </label>
+            <div className="flex h-11 w-full items-center border border-border bg-bg-elevated px-3.5">
+              <span className="font-mono text-[13px] font-medium text-gray-500">
+                {slugPreview || '\u2014'}
+              </span>
+            </div>
+            <span className="font-mono text-[11px] text-gray-500">
+              Auto-generated from name{nameChanged ? ' \u2014 will update when saved' : ''}
+            </span>
+          </div>
         </div>
 
         {isOwner && (
@@ -136,39 +158,70 @@ const SettingsPage: React.FC = () => {
       )}
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteOpen} onClose={() => setDeleteOpen(false)}>
+      <Dialog
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        slotProps={{
+          paper: {
+            sx: {
+              bgcolor: '#0A0A0A',
+              border: '1px solid #2f2f2f',
+              borderRadius: 0,
+            },
+          },
+        }}
+      >
         <DialogTitle
-          sx={{ fontFamily: 'Space Grotesk', fontWeight: 700, letterSpacing: '-0.5px' }}
+          sx={{
+            fontFamily: '"Space Grotesk", sans-serif',
+            fontWeight: 700,
+            fontSize: '1.25rem',
+            letterSpacing: '-0.5px',
+            pb: 1,
+          }}
         >
-          Delete Organization
+          DELETE ORGANIZATION
         </DialogTitle>
         <DialogContent>
-          <p className="mb-4 font-mono text-xs leading-relaxed text-gray-500">
-            This action is <span className="font-bold text-red-error">irreversible</span>.
-            All tasks, members, and data will be permanently deleted.
-          </p>
-          <p className="mb-4 font-mono text-xs text-gray-500">
-            Type <span className="font-bold text-white">{org.slug}</span> to confirm.
-          </p>
-          <TextField
-            value={confirmText}
-            onChange={(e) => setConfirmText(e.target.value)}
-            placeholder={org.slug}
-            fullWidth
-            autoFocus
-          />
+          <div className="flex flex-col gap-4 pt-2">
+            <p className="font-mono text-xs leading-relaxed text-gray-500">
+              This action is <span className="font-bold text-red-error">irreversible</span>.
+              All tasks, members, and data will be permanently deleted.
+            </p>
+            <div className="flex flex-col gap-2">
+              <label className="font-mono text-[11px] font-semibold uppercase tracking-wide text-gray-500">
+                Type <span className="text-white">{org.slug}</span> to confirm
+              </label>
+              <input
+                type="text"
+                value={confirmText}
+                onChange={(e) => setConfirmText(e.target.value)}
+                placeholder={org.slug}
+                autoFocus
+                className="h-11 w-full border border-border bg-bg-elevated px-3.5 font-mono text-[13px] font-medium text-white placeholder:text-gray-400 focus:border-red-error focus:outline-none"
+              />
+            </div>
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setDeleteOpen(false)}
+                className="flex h-10 items-center border border-border px-5 font-mono text-[11px] font-bold uppercase tracking-wide text-white hover:border-border-light hover:bg-bg-subtle"
+              >
+                CANCEL
+              </button>
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={confirmText !== org.slug}
+                className="flex h-10 items-center bg-red-error px-5 font-mono text-[11px] font-bold uppercase tracking-wide text-white hover:brightness-90 disabled:opacity-40 disabled:hover:brightness-100"
+              >
+                DELETE
+              </button>
+            </div>
+          </div>
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setDeleteOpen(false)}>Cancel</Button>
-          <Button
-            onClick={handleDelete}
-            disabled={confirmText !== org.slug}
-            color="error"
-            variant="contained"
-          >
-            Delete
-          </Button>
-        </DialogActions>
       </Dialog>
     </div>
   );
