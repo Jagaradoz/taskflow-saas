@@ -1,0 +1,89 @@
+import { useState, useCallback } from 'react';
+import { Dialog, DialogContent, DialogTitle } from '@mui/material';
+
+interface CreateTaskDialogProps {
+  open: boolean;
+  onClose: () => void;
+  onCreate: (title: string) => void;
+}
+
+export const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
+  open,
+  onClose,
+  onCreate,
+}) => {
+  const [title, setTitle] = useState('');
+
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!title.trim()) return;
+      onCreate(title.trim());
+      setTitle('');
+      onClose();
+    },
+    [title, onCreate, onClose],
+  );
+
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      slotProps={{
+        paper: {
+          sx: {
+            bgcolor: '#0A0A0A',
+            border: '1px solid #2f2f2f',
+            borderRadius: 0,
+          },
+        },
+      }}
+    >
+      <DialogTitle
+        sx={{
+          fontFamily: '"Space Grotesk", sans-serif',
+          fontWeight: 700,
+          fontSize: '1.25rem',
+          letterSpacing: '-0.5px',
+          pb: 1,
+        }}
+      >
+        NEW TASK
+      </DialogTitle>
+      <DialogContent>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5 pt-2">
+          <div className="flex flex-col gap-2">
+            <label className="font-mono text-[11px] font-semibold uppercase tracking-wide text-gray-500">
+              TASK TITLE
+            </label>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Enter task title..."
+              autoFocus
+              className="h-11 w-full border border-border bg-bg-elevated px-3.5 font-mono text-[13px] font-medium text-white placeholder:text-gray-400 focus:border-green-primary focus:outline-none"
+            />
+          </div>
+          <div className="flex justify-end gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex h-10 items-center border border-border px-5 font-mono text-[11px] font-bold uppercase tracking-wide text-white hover:border-border-light hover:bg-bg-subtle"
+            >
+              CANCEL
+            </button>
+            <button
+              type="submit"
+              className="flex h-10 items-center bg-green-primary px-5 font-mono text-[11px] font-bold uppercase tracking-wide text-black-on-accent hover:brightness-90"
+            >
+              CREATE TASK
+            </button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+};

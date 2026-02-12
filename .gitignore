@@ -29,16 +29,22 @@ Thumbs.db
 # Testing
 coverage/
 
+# Design files
+*.pen
+
 # Misc
 *.tgz
 .pnpm-store/
 
 # AI tooling
-.agent/
+.agent-skills/
 .claude/
 
 # Documentations
 /docs
+
+# Designs
+/designs
 
 # Markdown files
 *.md
