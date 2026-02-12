@@ -14,6 +14,9 @@ const MembersPage = lazy(() => import("@/features/members/pages/MembersPage"));
 const SettingsPage = lazy(() => import("@/features/orgs/pages/SettingsPage"));
 const OrgInvitesPage = lazy(() => import("@/features/invites/pages/OrgInvitesPage"));
 const MyInvitesPage = lazy(() => import("@/features/invites/pages/MyInvitesPage"));
+const OrgRequestsPage = lazy(() => import("@/features/join-requests/pages/OrgRequestsPage"));
+const MyRequestsPage = lazy(() => import("@/features/join-requests/pages/MyRequestsPage"));
+const JoinOrgPage = lazy(() => import("@/features/join-requests/pages/JoinOrgPage"));
 
 export const router = createBrowserRouter([
   // Guest-only routes (redirect to / if logged in)
@@ -95,7 +98,31 @@ export const router = createBrowserRouter([
               </SuspenseLoader>
             ),
           },
+          {
+            path: "requests",
+            element: (
+              <SuspenseLoader>
+                <OrgRequestsPage />
+              </SuspenseLoader>
+            ),
+          },
         ],
+      },
+      {
+        path: "/me/requests",
+        element: (
+          <SuspenseLoader>
+            <MyRequestsPage />
+          </SuspenseLoader>
+        ),
+      },
+      {
+        path: "/join/:slug",
+        element: (
+          <SuspenseLoader>
+            <JoinOrgPage />
+          </SuspenseLoader>
+        ),
       },
       {
         path: "/no-org",
