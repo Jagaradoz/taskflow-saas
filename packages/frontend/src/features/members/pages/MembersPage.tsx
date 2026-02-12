@@ -4,13 +4,13 @@ import { useDashboardContext } from '../../../hooks/useDashboardContext';
 import { getAuthState } from '../../../mock/auth';
 import { getMembersByOrg, removeMember } from '../../../mock/members';
 import { MemberTable } from '../components/MemberTable';
-import type { MemberWithUser } from '../../../types/membership';
+import type { Membership } from '../../../types/membership';
 
 const MembersPage: React.FC = () => {
   const { currentOrgId } = useDashboardContext();
   const auth = getAuthState()!;
 
-  const [members, setMembers] = useState<MemberWithUser[]>(() =>
+  const [members, setMembers] = useState<Membership[]>(() =>
     getMembersByOrg(currentOrgId),
   );
 

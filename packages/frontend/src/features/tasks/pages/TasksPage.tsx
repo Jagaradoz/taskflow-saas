@@ -8,14 +8,14 @@ import { TaskStatsCards } from '../components/TaskStatsCards';
 import { TaskTable } from '../components/TaskTable';
 import { CreateTaskDialog } from '../components/CreateTaskDialog';
 import type { Task } from '../../../types/task';
-import type { MemberWithUser } from '../../../types/membership';
+import type { Membership } from '../../../types/membership';
 
 const TasksPage: React.FC = () => {
   const { currentOrgId } = useDashboardContext();
   const auth = getAuthState()!;
 
   const [tasks, setTasks] = useState<Task[]>(() => getTasksByOrg(currentOrgId));
-  const [members] = useState<MemberWithUser[]>(() => getMembersByOrg(currentOrgId));
+  const [members] = useState<Membership[]>(() => getMembersByOrg(currentOrgId));
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const refreshTasks = useCallback(() => {

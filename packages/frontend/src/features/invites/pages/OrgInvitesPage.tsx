@@ -10,7 +10,7 @@ import {
 } from '../../../mock/membership-requests';
 import { InviteList } from '../components/InviteList';
 import { CreateInviteDialog } from '../components/CreateInviteDialog';
-import type { MembershipRequestWithUser } from '../../../types/membership-request';
+import type { MembershipRequestWithUser } from '../../../mock/membership-requests';
 
 const OrgInvitesPage: React.FC = () => {
   const { currentOrgId } = useDashboardContext();
@@ -36,7 +36,7 @@ const OrgInvitesPage: React.FC = () => {
 
       // Check if user is already a member
       const alreadyMember = members.some(
-        (m) => m.user.email.toLowerCase() === email.toLowerCase(),
+        (m) => m.user?.email?.toLowerCase() === email.toLowerCase(),
       );
       if (alreadyMember) {
         setInviteError('User is already a member of this organization.');
@@ -46,7 +46,7 @@ const OrgInvitesPage: React.FC = () => {
       // Check if there's already a pending invite for this email
       const alreadyInvited = invites.some(
         (i) =>
-          i.user.email.toLowerCase() === email.toLowerCase() &&
+          i.user?.email?.toLowerCase() === email.toLowerCase() &&
           i.status === 'pending',
       );
       if (alreadyInvited) {

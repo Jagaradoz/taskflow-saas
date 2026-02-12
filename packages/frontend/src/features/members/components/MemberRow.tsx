@@ -1,9 +1,9 @@
 import { useCallback } from 'react';
 import { X } from 'lucide-react';
-import type { MemberWithUser } from '../../../types/membership';
+import type { Membership } from '../../../types/membership';
 
 interface MemberRowProps {
-  member: MemberWithUser;
+  member: Membership;
   isCurrentUserOwner: boolean;
   onRemove: (membershipId: string) => void;
 }
@@ -13,7 +13,7 @@ export const MemberRow: React.FC<MemberRowProps> = ({
   isCurrentUserOwner,
   onRemove,
 }) => {
-  const initials = member.user.name
+  const initials = (member.user?.name ?? 'Un')
     .split(' ')
     .map((n) => n[0])
     .join('')
@@ -37,14 +37,14 @@ export const MemberRow: React.FC<MemberRowProps> = ({
           </span>
         </div>
         <span className="truncate font-mono text-[13px] font-medium text-white">
-          {member.user.name}
+          {member.user?.name ?? 'Unknown User'}
         </span>
       </div>
 
       {/* Email */}
       <div className="min-w-0 flex-1">
         <span className="font-mono text-[13px] font-medium text-gray-500">
-          {member.user.email}
+          {member.user?.email ?? 'No Email'}
         </span>
       </div>
 

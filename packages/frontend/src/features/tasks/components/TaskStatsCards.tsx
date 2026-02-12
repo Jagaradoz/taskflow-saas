@@ -1,10 +1,10 @@
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import type { Task } from '../../../types/task';
-import type { MemberWithUser } from '../../../types/membership';
+import type { Membership } from '../../../types/membership';
 
 interface TaskStatsCardsProps {
   tasks: Task[];
-  members: MemberWithUser[];
+  members: Membership[];
 }
 
 interface StatCard {

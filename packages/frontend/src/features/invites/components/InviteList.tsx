@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { X, Check } from 'lucide-react';
-import type { MembershipRequestWithUser } from '../../../types/membership-request';
+import type { MembershipRequestWithUser } from '../../../mock/membership-requests';
 
 interface InviteListProps {
   invites: MembershipRequestWithUser[];
@@ -109,23 +109,18 @@ const InviteRow: React.FC<InviteRowProps> = ({
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <div className="flex h-8 w-8 shrink-0 items-center justify-center border border-border-light bg-bg-subtle">
             <span className="font-mono text-[10px] font-semibold text-gray-500">
-              {invite.user.name
-                .split(' ')
-                .map((n) => n[0])
-                .join('')
-                .toUpperCase()
-                .slice(0, 2)}
+              {invite.user?.name ? invite.user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) : 'UN'}
             </span>
           </div>
           <span className="truncate font-mono text-[13px] font-medium text-white">
-            {invite.user.name}
+            {invite.user?.name ?? 'Unknown User'}
           </span>
         </div>
 
         {/* Email */}
         <div className="min-w-0 flex-1">
           <span className="font-mono text-[13px] font-medium text-gray-500">
-            {invite.user.email}
+            {invite.user?.email ?? 'No Email'}
           </span>
         </div>
 

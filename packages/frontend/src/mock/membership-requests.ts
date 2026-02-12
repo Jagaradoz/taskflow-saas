@@ -1,12 +1,58 @@
 import type {
     MembershipRequest,
-    MembershipRequestWithUser,
 } from '../types/membership-request';
 import { load, save, uid, type MockStore } from './store';
 
+// Define MembershipRequestWithUser locally if it's not imported
+export type MembershipRequestWithUser = Omit<
+    MembershipRequest,
+    'org' | 'inviter'
+> & {
+    user?: { name: string; email: string };
+    inviter?: { name: string };
+    org?: { name: string; slug: string };
+};
+
 // ---------------------------------------------------------------------------
-// Membership Requests (Invites & Join Requests)
+// Helpers
 // ---------------------------------------------------------------------------
+
+const enrichRequest = (
+    store: MockStore,
+    r: MembershipRequest,
+): MembershipRequestWithUser => {
+    const userId = r.type === 'invite' ? r.invitedUserId : r.requesterId;
+    const user = store.users.find((u) => u.id === userId);
+    const inviter = r.invitedBy
+        ? store.users.find((u) => u.id === r.invitedBy)
+        : undefined;
+    const org = store.organizations.find((o) => o.id === r.orgId);
+
+    return {
+        ...r,
+        user: user ? { name: user.name, email: user.email } : undefined,
+        ...(inviter ? { inviter: { name: inviter.name } } : {}),
+        ...(org ? { org: { name: org.name, slug: org.slug } } : {}),
+    };
+};
+
+// ---------------------------------------------------------------------------
+// Membership Requests
+// ---------------------------------------------------------------------------
+
+export const mockMembershipRequests: MembershipRequest[] = [
+    {
+        id: 'req_1',
+        orgId: 'org_1',
+        type: 'invite',
+        invitedUserId: 'user_2', // jane
+        invitedBy: 'user_1', // john
+        role: 'member',
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+    },
+];
 
 export const getOrgInvites = (orgId: string): MembershipRequestWithUser[] => {
     const store = load();
@@ -38,12 +84,12 @@ export const getMyRequests = (userId: string): MembershipRequestWithUser[] => {
 
 export const createInvite = (
     orgId: string,
+    email: string,
     invitedByUserId: string,
-    invitedEmail: string,
-): MembershipRequest | null => {
+): boolean => {
     const store = load();
-    const target = store.users.find((u) => u.email === invitedEmail);
-    if (!target) return null;
+    const target = store.users.find((u) => u.email === email);
+    if (!target) return false; // For mock, simply ignore if user doesn't exist
 
     const ts = new Date().toISOString();
     const req: MembershipRequest = {
@@ -52,18 +98,18 @@ export const createInvite = (
         type: 'invite',
         invitedUserId: target.id,
         invitedBy: invitedByUserId,
-        requesterId: null,
+        requesterId: undefined,
         role: 'member',
         status: 'pending',
-        message: null,
+        message: undefined,
         createdAt: ts,
         updatedAt: ts,
-        resolvedAt: null,
-        resolvedBy: null,
+        resolvedAt: undefined,
+        resolvedBy: undefined,
     };
     store.membershipRequests.push(req);
     save(store);
-    return req;
+    return true;
 };
 
 export const createJoinRequest = (
@@ -80,16 +126,16 @@ export const createJoinRequest = (
         id: uid(),
         orgId: org.id,
         type: 'request',
-        invitedUserId: null,
-        invitedBy: null,
+        invitedUserId: undefined,
+        invitedBy: undefined,
         requesterId,
         role: 'member',
         status: 'pending',
-        message: message ?? null,
+        message: message ?? undefined,
         createdAt: ts,
         updatedAt: ts,
-        resolvedAt: null,
-        resolvedBy: null,
+        resolvedAt: undefined,
+        resolvedBy: undefined,
     };
     store.membershipRequests.push(req);
     save(store);
@@ -124,27 +170,4 @@ export const resolveRequest = (
 
     save(store);
     return true;
-};
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-const enrichRequest = (
-    store: MockStore,
-    r: MembershipRequest,
-): MembershipRequestWithUser => {
-    const userId = r.type === 'invite' ? r.invitedUserId : r.requesterId;
-    const user = store.users.find((u) => u.id === userId);
-    const inviter = r.invitedBy
-        ? store.users.find((u) => u.id === r.invitedBy)
-        : undefined;
-    const org = store.organizations.find((o) => o.id === r.orgId);
-
-    return {
-        ...r,
-        user: { name: user?.name ?? 'Unknown', email: user?.email ?? '' },
-        ...(inviter ? { inviter: { name: inviter.name } } : {}),
-        ...(org ? { org: { name: org.name, slug: org.slug } } : {}),
-    };
 };

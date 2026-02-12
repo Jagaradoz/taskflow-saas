@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Button, TextField, Alert } from "@mui/material";
-import { mockLogin } from "@/lib/mock-data";
+import { mockLogin } from '../../../mock/auth';
 
 export function LoginForm(): JSX.Element {
   const navigate = useNavigate();

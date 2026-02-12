@@ -1,17 +1,21 @@
-import type { MemberWithUser } from '../types/membership';
+import type { Membership } from '../types/membership';
 import { load, save } from './store';
 
 // ---------------------------------------------------------------------------
 // Members
 // ---------------------------------------------------------------------------
 
-export const getMembersByOrg = (orgId: string): MemberWithUser[] => {
+export const getMembersByOrg = (orgId: string): Membership[] => {
     const store = load();
     return store.memberships
         .filter((m) => m.orgId === orgId)
         .map((m) => {
             const user = store.users.find((u) => u.id === m.userId)!;
-            return { ...m, user: { email: user.email, name: user.name } };
+            // Need to return full user object or cast as User.
+            // Since this is mock, providing partial is risky if type is strict.
+            // But let's assume partial for now or update later if needed.
+            // Actually, if User interface requires more fields, this will error.
+            return { ...m, user: user };
         });
 };
 

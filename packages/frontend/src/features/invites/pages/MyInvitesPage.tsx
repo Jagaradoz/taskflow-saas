@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { getAuthState } from '../../../mock/auth';
 import { getMyInvites, resolveRequest } from '../../../mock/membership-requests';
 import { InviteList } from '../components/InviteList';
-import type { MembershipRequestWithUser } from '../../../types/membership-request';
+import type { MembershipRequestWithUser } from '../../../mock/membership-requests';
 
 const MyInvitesPage: React.FC = () => {
   const auth = getAuthState()!;

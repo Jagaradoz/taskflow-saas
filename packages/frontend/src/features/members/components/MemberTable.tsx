@@ -1,8 +1,8 @@
-import type { MemberWithUser } from '../../../types/membership';
+import type { Membership } from '../../../types/membership';
 import { MemberRow } from './MemberRow';
 
 interface MemberTableProps {
-  members: MemberWithUser[];
+  members: Membership[];
   isCurrentUserOwner: boolean;
   onRemove: (membershipId: string) => void;
 }

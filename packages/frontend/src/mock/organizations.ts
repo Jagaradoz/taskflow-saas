@@ -22,7 +22,7 @@ export const createOrganization = (
         id: uid(),
         name,
         slug,
-        description: description ?? null,
+        description: description ?? undefined,
         createdAt: ts,
         updatedAt: ts,
     };

@@ -38,7 +38,7 @@ const SettingsPage: React.FC = () => {
 
   const handleSave = useCallback(() => {
     if (!org || !isOwner) return;
-    updateOrganization(currentOrgId, { name: name.trim(), description: description.trim() || null });
+    updateOrganization(currentOrgId, { name: name.trim(), description: description.trim() || undefined });
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   }, [currentOrgId, name, description, org, isOwner]);
