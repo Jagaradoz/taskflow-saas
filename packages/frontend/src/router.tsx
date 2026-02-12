@@ -5,6 +5,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { GuestRoute } from "@/components/GuestRoute";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { NoOrgState } from "@/features/orgs/components/NoOrgState";
+import { getAuthState } from "@/mock/auth";
 
 // Lazy-loaded pages
 const LoginPage = lazy(() => import("@/features/auth/pages/LoginPage"));
@@ -17,12 +18,31 @@ const MyInvitesPage = lazy(() => import("@/features/invites/pages/MyInvitesPage"
 const OrgRequestsPage = lazy(() => import("@/features/join-requests/pages/OrgRequestsPage"));
 const MyRequestsPage = lazy(() => import("@/features/join-requests/pages/MyRequestsPage"));
 const JoinOrgPage = lazy(() => import("@/features/join-requests/pages/JoinOrgPage"));
+const LandingPage = lazy(() => import("@/features/landing/pages/LandingPage"));
+
+function AppOrgRedirect(): JSX.Element {
+  const auth = getAuthState();
+  const firstOrg = auth?.memberships[0];
+  if (!firstOrg) {
+    return <Navigate to="/no-org" replace />;
+  }
+
+  return <Navigate to={`/app/${firstOrg.orgId}`} replace />;
+}
 
 export const router = createBrowserRouter([
-  // Guest-only routes (redirect to / if logged in)
+  // Guest-only routes (redirect to /app if logged in)
   {
     element: <GuestRoute />,
     children: [
+      {
+        path: "/",
+        element: (
+          <SuspenseLoader>
+            <LandingPage />
+          </SuspenseLoader>
+        ),
+      },
       {
         path: "/login",
         element: (
@@ -39,14 +59,6 @@ export const router = createBrowserRouter([
           </SuspenseLoader>
         ),
       },
-      {
-        path: "/landing",
-        element: (
-          <SuspenseLoader>
-            <LoginPage />
-          </SuspenseLoader>
-        ),
-      },
     ],
   },
 
@@ -55,7 +67,11 @@ export const router = createBrowserRouter([
     element: <ProtectedRoute />,
     children: [
       {
-        path: "/",
+        path: "/app",
+        element: <AppOrgRedirect />,
+      },
+      {
+        path: "/app/:orgId",
         element: <DashboardLayout />,
         children: [
           {
@@ -67,7 +83,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "members",
+            path: "member",
             element: (
               <SuspenseLoader>
                 <MembersPage />
@@ -131,7 +147,7 @@ export const router = createBrowserRouter([
     ],
   },
 
-  // Catch-all: redirect to /
+  // Catch-all: redirect to landing page
   {
     path: "*",
     element: <Navigate to="/" replace />,

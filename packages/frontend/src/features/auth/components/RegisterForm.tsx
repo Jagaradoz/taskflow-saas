@@ -26,8 +26,9 @@ export function RegisterForm(): JSX.Element {
 
       // Simulate async delay
       setTimeout(() => {
-        mockRegister(name, email, password);
-        navigate("/", { replace: true });
+        const result = mockRegister(name, email, password);
+        const firstOrg = result?.memberships[0];
+        navigate(firstOrg ? `/app/${firstOrg.orgId}` : "/no-org", { replace: true });
       }, 300);
     },
     [name, email, password, navigate],

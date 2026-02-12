@@ -27,7 +27,8 @@ export function LoginForm(): JSX.Element {
           return;
         }
 
-        navigate("/", { replace: true });
+        const firstOrg = result.memberships[0];
+        navigate(firstOrg ? `/app/${firstOrg.orgId}` : "/no-org", { replace: true });
       }, 300);
     },
     [email, password, navigate],

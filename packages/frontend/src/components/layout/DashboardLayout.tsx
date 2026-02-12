@@ -1,11 +1,13 @@
-import { useState, useCallback } from 'react';
-import { Outlet, Navigate } from 'react-router-dom';
+import { useCallback } from 'react';
+import { Outlet, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 import { getAuthState } from '../../mock/auth';
 
 export const DashboardLayout: React.FC = () => {
   const auth = getAuthState();
+  const navigate = useNavigate();
+  const { orgId } = useParams<{ orgId: string }>();
 
   // Redirect if not authenticated (shouldn't happen — ProtectedRoute catches it)
   if (!auth) return <Navigate to="/login" replace />;
@@ -17,20 +19,16 @@ export const DashboardLayout: React.FC = () => {
 
   const firstOrg = auth.memberships[0];
   if (!firstOrg) return <Navigate to="/no-org" replace />;
+  if (!orgId) return <Navigate to={`/app/${firstOrg.orgId}`} replace />;
 
-  return <DashboardShell defaultOrgId={firstOrg.orgId} />;
-};
+  const activeMembership = auth.memberships.find((membership) => membership.orgId === orgId);
+  if (!activeMembership) {
+    return <Navigate to={`/app/${firstOrg.orgId}`} replace />;
+  }
 
-interface DashboardShellProps {
-  defaultOrgId: string;
-}
-
-const DashboardShell: React.FC<DashboardShellProps> = ({ defaultOrgId }) => {
-  const [currentOrgId, setCurrentOrgId] = useState(defaultOrgId);
-
-  const handleSwitchOrg = useCallback((orgId: string) => {
-    setCurrentOrgId(orgId);
-  }, []);
+  const handleSwitchOrg = useCallback((nextOrgId: string) => {
+    navigate(`/app/${nextOrgId}`);
+  }, [navigate]);
 
   const handleCreateOrg = useCallback(() => {
     // TODO: Open create org dialog (Phase 4+)
@@ -38,15 +36,15 @@ const DashboardShell: React.FC<DashboardShellProps> = ({ defaultOrgId }) => {
 
   return (
     <div className="flex h-screen bg-bg-page">
-      <Sidebar />
+      <Sidebar currentOrgId={activeMembership.orgId} />
       <div className="flex min-w-0 flex-1 flex-col">
         <TopBar
-          currentOrgId={currentOrgId}
+          currentOrgId={activeMembership.orgId}
           onSwitchOrg={handleSwitchOrg}
           onCreateOrg={handleCreateOrg}
         />
         <main className="flex-1 overflow-y-auto">
-          <Outlet context={{ currentOrgId }} />
+          <Outlet context={{ currentOrgId: activeMembership.orgId }} />
         </main>
       </div>
     </div>

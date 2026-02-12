@@ -9,17 +9,21 @@ import {
 } from 'lucide-react';
 import { getAuthState, mockLogout } from '../../mock/auth';
 
-const NAV_ITEMS = [
-  { to: '/', label: 'TASKS', icon: LayoutDashboard },
-  { to: '/members', label: 'MEMBERS', icon: Users },
-  { to: '/settings', label: 'SETTINGS', icon: Settings },
-  { to: '/invites', label: 'INVITES', icon: Mail },
-  { to: '/requests', label: 'REQUESTS', icon: Inbox },
-] as const;
+interface SidebarProps {
+  currentOrgId: string;
+}
 
-export const Sidebar: React.FC = () => {
+export const Sidebar: React.FC<SidebarProps> = ({ currentOrgId }) => {
   const navigate = useNavigate();
   const auth = getAuthState();
+  const dashboardBasePath = `/app/${currentOrgId}`;
+  const navItems = [
+    { to: dashboardBasePath, label: 'TASKS', icon: LayoutDashboard },
+    { to: `${dashboardBasePath}/member`, label: 'MEMBERS', icon: Users },
+    { to: `${dashboardBasePath}/settings`, label: 'SETTINGS', icon: Settings },
+    { to: `${dashboardBasePath}/invites`, label: 'INVITES', icon: Mail },
+    { to: `${dashboardBasePath}/requests`, label: 'REQUESTS', icon: Inbox },
+  ] as const;
 
   const handleLogout = (): void => {
     mockLogout();
@@ -49,11 +53,11 @@ export const Sidebar: React.FC = () => {
 
         {/* Navigation */}
         <nav className="flex flex-col gap-0.5">
-          {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
+          {navItems.map(({ to, label, icon: Icon }) => (
             <NavLink
               key={to}
               to={to}
-              end={to === '/'}
+              end={to === dashboardBasePath}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-5 py-3 font-mono text-xs tracking-wide transition-colors ${
                   isActive

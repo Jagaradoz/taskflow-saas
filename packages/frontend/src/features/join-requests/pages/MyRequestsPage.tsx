@@ -30,7 +30,7 @@ const MyRequestsPage: React.FC = () => {
       {/* Top bar */}
       <div className="flex h-14 items-center border-b border-border px-6">
         <Link
-          to="/"
+          to="/app"
           className="flex items-center gap-2 font-mono text-xs font-medium text-gray-500 hover:text-white"
         >
           <ArrowLeft size={14} />
