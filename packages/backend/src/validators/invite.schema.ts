@@ -2,7 +2,7 @@
 import { z } from "zod";
 
 export const createInviteSchema = z.object({
-  userId: z.string().uuid({ message: "Invalid user ID format" }),
+  email: z.string().email({ message: "Invalid email format" }),
   role: z.enum(["member"], {
     errorMap: () => ({ message: "Role must be 'member'" }),
   }),

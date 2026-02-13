@@ -117,6 +117,14 @@ export const orgRepository = {
     return result.rows[0]?.exists ?? false;
   },
 
+  async delete(id: string, client?: Queryable): Promise<boolean> {
+    const db = client ?? pool;
+    const result = await db.query("DELETE FROM organizations WHERE id = $1", [
+      id,
+    ]);
+    return (result.rowCount ?? 0) > 0;
+  },
+
   async nameExists(name: string, excludeId?: string): Promise<boolean> {
     const result = await pool.query<{ exists: boolean }>(
       excludeId
