@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { Outlet, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
@@ -8,6 +8,7 @@ export const DashboardLayout: React.FC = () => {
   const auth = getAuthState();
   const navigate = useNavigate();
   const { orgId } = useParams<{ orgId: string }>();
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   // Redirect if not authenticated (shouldn't happen — ProtectedRoute catches it)
   if (!auth) return <Navigate to="/login" replace />;
@@ -34,16 +35,49 @@ export const DashboardLayout: React.FC = () => {
     navigate('/orgs/new');
   }, [navigate]);
 
+  const handleOpenMobileNav = useCallback(() => {
+    setMobileNavOpen(true);
+  }, []);
+
+  const handleCloseMobileNav = useCallback(() => {
+    setMobileNavOpen(false);
+  }, []);
+
   return (
     <div className="flex h-screen bg-bg-page">
-      <Sidebar currentOrgId={activeMembership.orgId} />
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="hidden h-screen lg:block">
+        <Sidebar currentOrgId={activeMembership.orgId} />
+      </div>
+
+      {mobileNavOpen && (
+        <button
+          aria-label="Close navigation overlay"
+          onClick={handleCloseMobileNav}
+          className="fixed inset-0 z-40 bg-black/60 lg:hidden"
+        />
+      )}
+
+      <div
+        className={`fixed inset-y-0 left-0 z-50 transition-transform duration-200 lg:hidden ${
+          mobileNavOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <Sidebar
+          currentOrgId={activeMembership.orgId}
+          mobile
+          onClose={handleCloseMobileNav}
+          onNavigate={handleCloseMobileNav}
+        />
+      </div>
+
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <TopBar
           currentOrgId={activeMembership.orgId}
           onSwitchOrg={handleSwitchOrg}
           onCreateOrg={handleCreateOrg}
+          onOpenNav={handleOpenMobileNav}
         />
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto">
           <Outlet context={{ currentOrgId: activeMembership.orgId }} />
         </main>
       </div>

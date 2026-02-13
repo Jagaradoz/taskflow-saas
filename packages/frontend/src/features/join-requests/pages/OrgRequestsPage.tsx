@@ -40,9 +40,9 @@ const OrgRequestsPage: React.FC = () => {
 
   if (!isOwner) {
     return (
-      <div className="flex flex-col gap-8 p-8 px-10">
+      <div className="flex flex-col gap-6 p-4 sm:gap-8 sm:p-6 lg:px-10 lg:py-8">
         <div className="flex flex-col gap-2">
-          <h1 className="font-display text-[42px] font-bold leading-none tracking-tight text-white">
+          <h1 className="font-display text-[30px] font-bold leading-none tracking-tight text-white sm:text-[36px] lg:text-[42px]">
             REQUESTS
           </h1>
           <p className="font-mono text-sm font-normal text-gray-500">
@@ -54,11 +54,11 @@ const OrgRequestsPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col gap-8 p-8 px-10">
+    <div className="flex flex-col gap-6 p-4 sm:gap-8 sm:p-6 lg:px-10 lg:py-8">
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-2">
-          <h1 className="font-display text-[42px] font-bold leading-none tracking-tight text-white">
+          <h1 className="font-display text-[30px] font-bold leading-none tracking-tight text-white sm:text-[36px] lg:text-[42px]">
             REQUESTS
           </h1>
           <p className="font-mono text-sm font-normal text-gray-500">

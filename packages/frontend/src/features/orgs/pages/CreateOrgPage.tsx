@@ -68,8 +68,8 @@ const CreateOrgPage: React.FC = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-bg-page px-4 py-10">
-      <div className="flex w-full max-w-[560px] flex-col gap-6 border border-border bg-bg-card p-8">
-        <div className="flex items-center justify-between">
+      <div className="flex w-full max-w-[560px] flex-col gap-6 border border-border bg-bg-card p-5 sm:p-8">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <Link
             to={backToPath}
             className="inline-flex items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-wide text-gray-500 hover:text-white"
@@ -86,7 +86,7 @@ const CreateOrgPage: React.FC = () => {
         </div>
 
         <div className="flex flex-col gap-2">
-          <h1 className="font-display text-4xl font-bold tracking-tight text-white">
+          <h1 className="font-display text-[30px] font-bold tracking-tight text-white sm:text-4xl">
             CREATE ORGANIZATION
           </h1>
           <p className="font-mono text-xs text-gray-500">
@@ -134,18 +134,18 @@ const CreateOrgPage: React.FC = () => {
 
           {error && <p className="font-mono text-[11px] text-red-error">{error}</p>}
 
-          <div className="flex justify-end gap-3">
+          <div className="flex flex-col justify-end gap-3 sm:flex-row">
             <button
               type="button"
               onClick={() => navigate(backToPath)}
-              className="flex h-10 items-center border border-border px-5 font-mono text-[11px] font-bold uppercase tracking-wide text-white hover:border-border-light hover:bg-bg-subtle"
+              className="flex h-10 w-full items-center justify-center border border-border px-5 font-mono text-[11px] font-bold uppercase tracking-wide text-white hover:border-border-light hover:bg-bg-subtle sm:w-auto"
             >
               CANCEL
             </button>
             <button
               type="submit"
               disabled={saving || !name.trim()}
-              className="flex h-10 items-center bg-green-primary px-5 font-mono text-[11px] font-bold uppercase tracking-wide text-black-on-accent hover:brightness-90 disabled:opacity-50 disabled:hover:brightness-100"
+              className="flex h-10 w-full items-center justify-center bg-green-primary px-5 font-mono text-[11px] font-bold uppercase tracking-wide text-black-on-accent hover:brightness-90 disabled:opacity-50 disabled:hover:brightness-100 sm:w-auto"
             >
               {saving ? 'CREATING...' : 'CREATE ORGANIZATION'}
             </button>

@@ -27,7 +27,7 @@ export const TaskStatsCards: React.FC<TaskStatsCardsProps> = ({ tasks, members }
   ];
 
   return (
-    <div className="flex gap-3">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
       {cards.map((card) => {
         const isPositive = card.change >= 0;
         const Icon = isPositive ? TrendingUp : TrendingDown;

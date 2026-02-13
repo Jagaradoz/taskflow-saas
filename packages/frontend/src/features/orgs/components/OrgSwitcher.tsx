@@ -40,9 +40,9 @@ export const OrgSwitcher: React.FC<OrgSwitcherProps> = ({
     <>
       <button
         onClick={handleOpen}
-        className="flex items-center gap-2 border border-border px-3 py-2 font-mono text-xs font-medium text-white hover:border-border-light"
+        className="ml-auto flex max-w-[78vw] items-center gap-2 border border-border px-3 py-2 font-mono text-xs font-medium text-white hover:border-border-light sm:max-w-[320px]"
       >
-        {currentOrg?.orgName ?? 'Select organization'}
+        <span className="truncate">{currentOrg?.orgName ?? 'Select organization'}</span>
         <ChevronDown size={14} className="text-gray-500" />
       </button>
 

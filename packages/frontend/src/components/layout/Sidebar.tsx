@@ -6,14 +6,23 @@ import {
   Mail,
   Inbox,
   LogOut,
+  X,
 } from 'lucide-react';
 import { getAuthState, mockLogout } from '../../mock/auth';
 
 interface SidebarProps {
   currentOrgId: string;
+  mobile?: boolean;
+  onClose?: () => void;
+  onNavigate?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ currentOrgId }) => {
+export const Sidebar: React.FC<SidebarProps> = ({
+  currentOrgId,
+  mobile = false,
+  onClose,
+  onNavigate,
+}) => {
   const navigate = useNavigate();
   const auth = getAuthState();
   const dashboardBasePath = `/app/${currentOrgId}`;
@@ -27,6 +36,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentOrgId }) => {
 
   const handleLogout = (): void => {
     mockLogout();
+    onNavigate?.();
     navigate('/login');
   };
 
@@ -38,7 +48,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentOrgId }) => {
     .slice(0, 2) ?? '';
 
   return (
-    <aside className="flex h-screen w-60 shrink-0 flex-col justify-between border-r border-border bg-bg-sidebar pt-6">
+    <aside className="flex h-full w-60 shrink-0 flex-col justify-between border-r border-border bg-bg-sidebar pt-6">
       {/* Top */}
       <div className="flex flex-col">
         {/* Logo */}
@@ -49,6 +59,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentOrgId }) => {
           <span className="font-mono text-sm font-semibold tracking-[1px] text-white">
             TASKFLOW
           </span>
+          {mobile && onClose && (
+            <button
+              onClick={onClose}
+              className="ml-auto text-gray-500 hover:text-white"
+              title="Close navigation"
+            >
+              <X size={16} />
+            </button>
+          )}
         </div>
 
         {/* Navigation */}
@@ -58,6 +77,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentOrgId }) => {
               key={to}
               to={to}
               end={to === dashboardBasePath}
+              onClick={onNavigate}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-5 py-3 font-mono text-xs tracking-wide transition-colors ${
                   isActive

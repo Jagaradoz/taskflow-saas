@@ -33,6 +33,7 @@ export const RequestList: React.FC<RequestListProps> = ({
   onCancel,
 }) => {
   const columns = variant === 'org' ? ORG_COLUMNS : MY_COLUMNS;
+  const minTableWidth = variant === 'org' ? 'min-w-[780px]' : 'min-w-[680px]';
 
   if (requests.length === 0) {
     return (
@@ -48,28 +49,32 @@ export const RequestList: React.FC<RequestListProps> = ({
 
   return (
     <div className="border border-border bg-bg-card">
-      {/* Header */}
-      <div className="flex items-center border-b border-border px-4 py-3">
-        {columns.map((col) => (
-          <div key={col.label} className={`shrink-0 ${col.width}`}>
-            <span className="font-mono text-[11px] font-bold uppercase tracking-wide text-gray-500">
-              {col.label}
-            </span>
+      <div className="overflow-x-auto">
+        <div className={minTableWidth}>
+          {/* Header */}
+          <div className="flex items-center border-b border-border px-4 py-3">
+            {columns.map((col) => (
+              <div key={col.label} className={`shrink-0 ${col.width}`}>
+                <span className="font-mono text-[11px] font-bold uppercase tracking-wide text-gray-500">
+                  {col.label}
+                </span>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      {/* Rows */}
-      {requests.map((request) => (
-        <RequestRow
-          key={request.id}
-          request={request}
-          variant={variant}
-          onApprove={onApprove}
-          onReject={onReject}
-          onCancel={onCancel}
-        />
-      ))}
+          {/* Rows */}
+          {requests.map((request) => (
+            <RequestRow
+              key={request.id}
+              request={request}
+              variant={variant}
+              onApprove={onApprove}
+              onReject={onReject}
+              onCancel={onCancel}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

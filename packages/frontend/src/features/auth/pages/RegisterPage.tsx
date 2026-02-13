@@ -64,7 +64,7 @@ export function RegisterPage(): JSX.Element {
         <RegisterForm />
 
         {/* Login link */}
-        <Box className="flex items-center" sx={{ gap: "4px" }}>
+        <Box className="flex flex-wrap items-center justify-center" sx={{ gap: "4px" }}>
           <Typography
             sx={{
               fontFamily: '"JetBrains Mono", monospace',

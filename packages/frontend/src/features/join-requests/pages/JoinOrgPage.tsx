@@ -39,7 +39,7 @@ const JoinOrgPage: React.FC = () => {
   if (!org) {
     return (
       <div className="flex min-h-screen flex-col bg-bg-page">
-        <div className="flex h-14 items-center border-b border-border px-6">
+        <div className="flex h-14 items-center border-b border-border px-4 sm:px-6">
           <Link
             to="/app"
             className="flex items-center gap-2 font-mono text-xs font-medium text-gray-500 hover:text-white"
@@ -53,7 +53,7 @@ const JoinOrgPage: React.FC = () => {
           <h2 className="font-display text-2xl font-bold text-white">
             ORGANIZATION NOT FOUND
           </h2>
-          <p className="font-mono text-sm text-gray-500">
+          <p className="px-4 text-center font-mono text-sm text-gray-500">
             No organization with slug "{slug}" exists.
           </p>
         </div>
@@ -64,7 +64,7 @@ const JoinOrgPage: React.FC = () => {
   return (
     <div className="flex min-h-screen flex-col bg-bg-page">
       {/* Top bar */}
-      <div className="flex h-14 items-center border-b border-border px-6">
+      <div className="flex h-14 items-center border-b border-border px-4 sm:px-6">
         <Link
           to="/app"
           className="flex items-center gap-2 font-mono text-xs font-medium text-gray-500 hover:text-white"
@@ -75,13 +75,13 @@ const JoinOrgPage: React.FC = () => {
       </div>
 
       {/* Content */}
-      <div className="mx-auto flex w-full max-w-lg flex-col gap-8 p-8 pt-16">
+      <div className="mx-auto flex w-full max-w-lg flex-col gap-6 p-4 pt-10 sm:gap-8 sm:p-6 sm:pt-14 lg:pt-16">
         {/* Org info */}
         <div className="flex flex-col gap-3 border border-border bg-bg-card p-6">
           <span className="font-mono text-[11px] font-medium uppercase tracking-[1px] text-gray-500">
             ORGANIZATION
           </span>
-          <h1 className="font-display text-3xl font-bold text-white">
+          <h1 className="font-display text-2xl font-bold text-white sm:text-3xl">
             {org.name}
           </h1>
           {org.description && (
