@@ -22,7 +22,7 @@ export const NoOrgState: React.FC = () => {
           JOIN ORGANIZATION
         </button>
         <button
-          onClick={() => navigate('/app')}
+          onClick={() => navigate('/orgs/new')}
           className="flex h-11 items-center bg-green-primary px-6 font-mono text-[11px] font-bold uppercase tracking-wide text-black-on-accent hover:brightness-90"
         >
           CREATE ORGANIZATION

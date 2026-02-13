@@ -54,7 +54,7 @@ const OrgInvitesPage: React.FC = () => {
         return;
       }
 
-      const result = createInvite(currentOrgId, auth.user.id, email);
+      const result = createInvite(currentOrgId, email, auth.user.id);
       if (!result) {
         setInviteError('User not found. They must have a TaskFlow account.');
         return;

@@ -13,6 +13,7 @@ const RegisterPage = lazy(() => import("@/features/auth/pages/RegisterPage"));
 const TasksPage = lazy(() => import("@/features/tasks/pages/TasksPage"));
 const MembersPage = lazy(() => import("@/features/members/pages/MembersPage"));
 const SettingsPage = lazy(() => import("@/features/orgs/pages/SettingsPage"));
+const CreateOrgPage = lazy(() => import("@/features/orgs/pages/CreateOrgPage"));
 const OrgInvitesPage = lazy(() => import("@/features/invites/pages/OrgInvitesPage"));
 const MyInvitesPage = lazy(() => import("@/features/invites/pages/MyInvitesPage"));
 const OrgRequestsPage = lazy(() => import("@/features/join-requests/pages/OrgRequestsPage"));
@@ -31,7 +32,7 @@ function AppOrgRedirect(): JSX.Element {
 }
 
 export const router = createBrowserRouter([
-  // Guest-only routes (redirect to /app if logged in)
+  // Guest-only routes (redirect to /app/:orgId if logged in)
   {
     element: <GuestRoute />,
     children: [
@@ -143,6 +144,14 @@ export const router = createBrowserRouter([
       {
         path: "/no-org",
         element: <NoOrgState />,
+      },
+      {
+        path: "/orgs/new",
+        element: (
+          <SuspenseLoader>
+            <CreateOrgPage />
+          </SuspenseLoader>
+        ),
       },
     ],
   },

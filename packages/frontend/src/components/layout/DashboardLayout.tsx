@@ -31,8 +31,8 @@ export const DashboardLayout: React.FC = () => {
   }, [navigate]);
 
   const handleCreateOrg = useCallback(() => {
-    // TODO: Open create org dialog (Phase 4+)
-  }, []);
+    navigate('/orgs/new');
+  }, [navigate]);
 
   return (
     <div className="flex h-screen bg-bg-page">
