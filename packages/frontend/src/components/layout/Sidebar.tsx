@@ -37,7 +37,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const handleLogout = (): void => {
     mockLogout();
     onNavigate?.();
-    navigate('/login');
+    navigate('/');
   };
 
   const initials = auth?.user.name
