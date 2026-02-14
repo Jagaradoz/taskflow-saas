@@ -1,4 +1,4 @@
-// Libraries
+// Third-party
 import { z } from "zod";
 
 const envSchema = z.object({

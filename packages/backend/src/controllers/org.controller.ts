@@ -1,9 +1,14 @@
+// Third-party
 import type { Request, Response } from "express";
-import { orgService } from "../services/org-service.js";
+
+// Modules
+import { orgService } from "../services/org.service.js";
 import { createOrgSchema, updateOrgSchema } from "../validators/org.schema.js";
 import { ValidationError, ForbiddenError, UnauthorizedError } from "../utils/errors.js";
 import { sendSuccess, sendError } from "../utils/response.js";
-import "../types/express.js";
+
+// Types
+import "../types/express.type.js";
 
 // @route GET /api/orgs
 // @desc  List all organizations (authenticated, optional search)
@@ -53,15 +58,20 @@ export async function create(req: Request, res: Response): Promise<void> {
 export async function getById(req: Request, res: Response): Promise<void> {
   try {
     const userId = req.user?.id;
+
+    // Validate user
     if (!userId) {
       throw new UnauthorizedError("User not found in session");
     }
 
     const orgId = req.params.id;
+
+    // Validate organization
     if (!orgId) {
       throw new ValidationError("Organization ID is required");
     }
 
+    // Get organization
     const org = await orgService.getOrgById(orgId, userId);
 
     sendSuccess(res, { organization: org });
@@ -75,11 +85,11 @@ export async function getById(req: Request, res: Response): Promise<void> {
 export async function update(req: Request, res: Response): Promise<void> {
   try {
     const orgId = req.params.id;
+
+    // Validate organization
     if (!orgId) {
       throw new ValidationError("Organization ID is required");
     }
-
-    // Ensure the URL org matches the session org to prevent cross-org updates
     if (orgId !== req.currentOrgId) {
       throw new ForbiddenError(
         "Organization ID mismatch. You can only update your current organization.",
@@ -87,6 +97,8 @@ export async function update(req: Request, res: Response): Promise<void> {
     }
 
     const parseResult = updateOrgSchema.safeParse(req.body);
+
+    // Validate request body
     if (!parseResult.success) {
       throw new ValidationError(
         "Validation failed",
@@ -97,6 +109,7 @@ export async function update(req: Request, res: Response): Promise<void> {
       );
     }
 
+    // Update organization
     const org = await orgService.updateOrg(orgId, parseResult.data);
 
     sendSuccess(res, { organization: org });
@@ -110,22 +123,26 @@ export async function update(req: Request, res: Response): Promise<void> {
 export async function deleteOrg(req: Request, res: Response): Promise<void> {
   try {
     const userId = req.user?.id;
+
+    // Validate user
     if (!userId) {
       throw new UnauthorizedError("User not found in session");
     }
 
     const orgId = req.params.id;
+
+    // Validate organization
     if (!orgId) {
       throw new ValidationError("Organization ID is required");
     }
-
     if (orgId !== req.currentOrgId) {
       throw new ForbiddenError(
         "Organization ID mismatch. You can only delete your current organization.",
       );
     }
 
-    await orgService.deleteOrg(orgId, userId);
+    // Delete organization
+    await orgService.deleteOrg(orgId);
 
     req.session.currentOrgId = undefined;
 
@@ -140,15 +157,20 @@ export async function deleteOrg(req: Request, res: Response): Promise<void> {
 export async function switchOrg(req: Request, res: Response): Promise<void> {
   try {
     const userId = req.user?.id;
+
+    // Validate user
     if (!userId) {
       throw new UnauthorizedError("User not found in session");
     }
 
     const orgId = req.params.id;
+
+    // Validate organization
     if (!orgId) {
       throw new ValidationError("Organization ID is required");
     }
 
+    // Switch organization
     const org = await orgService.switchOrg(userId, orgId);
 
     req.session.currentOrgId = org.id;

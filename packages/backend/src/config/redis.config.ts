@@ -1,9 +1,9 @@
-// Libraries
+// Third-party
 import Redis from "ioredis";
 
-// Local
-import { env } from "./env.js";
-import { logger } from "./logger.js";
+// Config
+import { env } from "./env.config.js";
+import { logger } from "./logger.config.js";
 
 export const redis = new Redis(env.REDIS_URL, {
   maxRetriesPerRequest: 3,

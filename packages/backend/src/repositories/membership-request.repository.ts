@@ -1,6 +1,10 @@
-// Local
-import { pool } from "../config/db.js";
+// Config
+import { pool } from "../config/db.config.js";
+
+// Modules
 import { AppError, ValidationError } from "../utils/errors.js";
+
+// Types
 import type { Queryable } from "../utils/transaction.js";
 import type {
   MembershipRequest,
@@ -10,7 +14,7 @@ import type {
   MembershipRequestWithUserRow,
   MembershipRequestWithUser,
   CreateMembershipRequestData,
-} from "../types/membership-request.js";
+} from "../types/membership-request.type.js";
 
 function mapRowToMembershipRequest(
   row: MembershipRequestRow,

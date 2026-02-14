@@ -1,7 +1,11 @@
-// Local
-import { pool } from "../config/db.js";
+// Config
+import { pool } from "../config/db.config.js";
+
+// Modules
 import { AppError } from "../utils/errors.js";
-import type { Task, TaskRow } from "../types/task.js";
+
+// Types
+import type { Task, TaskRow } from "../types/task.type.js";
 
 function rowToTask(row: TaskRow): Task {
   return {

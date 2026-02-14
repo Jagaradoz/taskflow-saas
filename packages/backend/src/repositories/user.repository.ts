@@ -1,11 +1,13 @@
-// Local
-import { pool } from "../config/db.js";
+// Config
+import { pool } from "../config/db.config.js";
+
+// Types
 import type {
   User,
   UserRow,
   MembershipWithOrgRow,
   UserWithMemberships,
-} from "../types/user.js";
+} from "../types/user.type.js";
 
 export const userRepository = {
   async findByEmail(

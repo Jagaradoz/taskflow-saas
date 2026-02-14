@@ -1,5 +1,8 @@
+// Third-party
 import { Router } from "express";
-import * as taskController from "../controllers/task-controller.js";
+
+// Modules
+import * as taskController from "../controllers/task.controller.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 import { requireTenant } from "../middleware/tenant.middleware.js";
 

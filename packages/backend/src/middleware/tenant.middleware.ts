@@ -1,11 +1,13 @@
-// Libraries
+// Third-party
 import type { Request, Response, NextFunction } from "express";
 
-// Local
-import { memberRepository } from "../repositories/member-repository.js";
+// Modules
+import { memberRepository } from "../repositories/member.repository.js";
 import { ForbiddenError } from "../utils/errors.js";
-import type { RequestMembership } from "../types/express.js";
-import "../types/express.js";
+
+// Types
+import type { RequestMembership } from "../types/express.type.js";
+import "../types/express.type.js";
 
 export const requireTenant = async (
   req: Request,

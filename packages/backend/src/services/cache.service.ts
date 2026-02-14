@@ -1,9 +1,9 @@
-// Libraries
+// Third-party
 import type { Redis } from "ioredis";
 
-// Local
-import { redis } from "../config/redis.js";
-import { logger } from "../config/logger.js";
+// Config
+import { logger } from "../config/logger.config.js";
+import { redis } from "../config/redis.config.js";
 
 const DEFAULT_TTL = 300; // 5 minutes
 

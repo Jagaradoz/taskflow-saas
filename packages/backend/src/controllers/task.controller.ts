@@ -1,22 +1,30 @@
+// Third-party
 import type { Request, Response } from "express";
-import { taskService } from "../services/task-service.js";
+
+// Modules
+import { taskService } from "../services/task.service.js";
 import {
   createTaskSchema,
   updateTaskSchema,
 } from "../validators/task.schema.js";
 import { ValidationError } from "../utils/errors.js";
 import { sendSuccess, sendError } from "../utils/response.js";
-import "../types/express.js";
+
+// Types
+import "../types/express.type.js";
 
 // @route GET /api/tasks
 // @desc  List tasks (any member can view)
 export async function list(req: Request, res: Response): Promise<void> {
   try {
     const orgId = req.currentOrgId;
+
+    // Validate organization
     if (!orgId) {
       throw new ValidationError("Organization not selected");
     }
 
+    // List tasks
     const tasks = await taskService.listTasks(orgId);
 
     sendSuccess(res, { tasks });
@@ -32,14 +40,19 @@ export async function create(req: Request, res: Response): Promise<void> {
     const orgId = req.currentOrgId;
     const userId = req.user?.id;
 
+    // Validate organization
     if (!orgId) {
       throw new ValidationError("Organization not selected");
     }
+
+    // Validate user
     if (!userId) {
       throw new ValidationError("User not found in session");
     }
 
     const parseResult = createTaskSchema.safeParse(req.body);
+
+    // Validate request body
     if (!parseResult.success) {
       throw new ValidationError(
         "Validation failed",
@@ -50,6 +63,7 @@ export async function create(req: Request, res: Response): Promise<void> {
       );
     }
 
+    // Create task
     const task = await taskService.createTask(
       orgId,
       userId,
@@ -71,22 +85,31 @@ export async function update(req: Request, res: Response): Promise<void> {
     const userId = req.user?.id;
     const userRole = req.membership?.role;
 
+    // Validate organization
     if (!orgId) {
       throw new ValidationError("Organization not selected");
     }
+
+    // Validate user
     if (!userId) {
       throw new ValidationError("User not found in session");
     }
+
+    // Validate user role
     if (!userRole) {
       throw new ValidationError("User role not found");
     }
 
     const taskId = req.params.id;
+
+    // Validate task
     if (!taskId) {
       throw new ValidationError("Task ID is required");
     }
 
     const parseResult = updateTaskSchema.safeParse(req.body);
+
+    // Validate request body
     if (!parseResult.success) {
       throw new ValidationError(
         "Validation failed",
@@ -97,6 +120,7 @@ export async function update(req: Request, res: Response): Promise<void> {
       );
     }
 
+    // Update task
     const task = await taskService.updateTask(
       taskId,
       orgId,
@@ -119,21 +143,29 @@ export async function remove(req: Request, res: Response): Promise<void> {
     const userId = req.user?.id;
     const userRole = req.membership?.role;
 
+    // Validate organization
     if (!orgId) {
       throw new ValidationError("Organization not selected");
     }
+
+    // Validate user
     if (!userId) {
       throw new ValidationError("User not found in session");
     }
+
+    // Validate user role
     if (!userRole) {
       throw new ValidationError("User role not found");
     }
 
     const taskId = req.params.id;
+
+    // Validate task
     if (!taskId) {
       throw new ValidationError("Task ID is required");
     }
 
+    // Delete task
     await taskService.deleteTask(taskId, orgId, userId, userRole);
 
     sendSuccess(res, { message: "Task deleted successfully" });

@@ -1,17 +1,14 @@
+// Third-party
 import type { Response } from "express";
+
+// Config
+import { logger } from "../config/logger.config.js";
+
+// Modules
 import { AppError, ValidationError } from "./errors.js";
-import { logger } from "../config/logger.js";
 
-interface SuccessResponse<T> {
-  status: "success";
-  data: T;
-}
-
-interface ErrorResponse {
-  status: "error";
-  message: string;
-  errors?: Array<{ field: string; message: string }>;
-}
+// Types
+import type { SuccessResponse, ErrorResponse } from "../types/response.type.js";
 
 export function sendSuccess<T>(res: Response, data: T, statusCode = 200): void {
   const response: SuccessResponse<T> = {

@@ -1,10 +1,10 @@
-// Libraries
+// Third-party
 import RedisStore from "connect-redis";
 import session from "express-session";
 
-// Local
-import { env } from "./env.js";
-import { redis } from "./redis.js";
+// Config
+import { env } from "./env.config.js";
+import { redis } from "./redis.config.js";
 
 export const sessionMiddleware = session({
   store: new RedisStore({ client: redis }),

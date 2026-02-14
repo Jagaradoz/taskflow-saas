@@ -1,10 +1,10 @@
 import "dotenv/config";
 
-// Libraries
+// Third-party
 import { readdir, readFile } from "fs/promises";
+import pg from "pg";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
-import pg from "pg";
 
 const { Pool } = pg;
 const __dirname = dirname(fileURLToPath(import.meta.url));

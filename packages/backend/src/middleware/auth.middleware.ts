@@ -1,12 +1,16 @@
-// Libraries
+// Third-party
 import type { Request, Response, NextFunction } from "express";
 
-// Local
-import { userRepository } from "../repositories/user-repository.js";
+// Config
+import { logger } from "../config/logger.config.js";
+
+// Modules
+import { userRepository } from "../repositories/user.repository.js";
 import { UnauthorizedError } from "../utils/errors.js";
-import { logger } from "../config/logger.js";
-import type { RequestUser } from "../types/express.js";
-import "../types/express.js";
+
+// Types
+import type { RequestUser } from "../types/express.type.js";
+import "../types/express.type.js";
 
 export const authenticate = async (
   req: Request,

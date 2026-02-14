@@ -1,8 +1,12 @@
-// Local
-import { pool } from "../config/db.js";
+// Config
+import { pool } from "../config/db.config.js";
+
+// Modules
 import { AppError } from "../utils/errors.js";
+
+// Types
 import type { Queryable } from "../utils/transaction.js";
-import type { Organization, OrgRow } from "../types/organization.js";
+import type { Organization, OrgRow } from "../types/organization.type.js";
 
 export const orgRepository = {
   async findAll(

@@ -1,5 +1,5 @@
-// Local
-import type { MemberRole } from "./membership.js";
+// Types
+import type { MemberRole } from "./membership.type.js";
 
 export interface RequestUser {
   id: string;

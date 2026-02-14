@@ -1,7 +1,7 @@
-// Local
-import { memberRepository } from "../repositories/member-repository.js";
+// Modules
+import { memberRepository } from "../repositories/member.repository.js";
 import { NotFoundError, ForbiddenError } from "../utils/errors.js";
-import { cacheService, cacheKeys, cacheTTL } from "./cache-service.js";
+import { cacheService, cacheKeys, cacheTTL } from "./cache.service.js";
 
 export const memberService = {
   async listMembers(orgId: string) {

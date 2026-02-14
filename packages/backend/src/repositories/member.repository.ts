@@ -1,6 +1,10 @@
-// Local
-import { pool } from "../config/db.js";
+// Config
+import { pool } from "../config/db.config.js";
+
+// Modules
 import { AppError } from "../utils/errors.js";
+
+// Types
 import type { Queryable } from "../utils/transaction.js";
 import type {
   Membership,
@@ -8,7 +12,7 @@ import type {
   MembershipRow,
   MemberWithUserRow,
   MemberWithUser,
-} from "../types/membership.js";
+} from "../types/membership.type.js";
 
 export const memberRepository = {
   async create(

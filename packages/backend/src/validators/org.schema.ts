@@ -1,7 +1,7 @@
-// Libraries
+// Third-party
 import { z } from "zod";
 
-// Local
+// Modules
 import { toTitleCase } from "../utils/string.js";
 
 export const createOrgSchema = z.object({

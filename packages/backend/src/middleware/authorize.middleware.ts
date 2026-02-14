@@ -1,10 +1,12 @@
-// Libraries
+// Third-party
 import type { Request, Response, NextFunction } from "express";
 
-// Local
+// Modules
 import { ForbiddenError } from "../utils/errors.js";
-import type { MemberRole } from "../types/membership.js";
-import "../types/express.js";
+
+// Types
+import type { MemberRole } from "../types/membership.type.js";
+import "../types/express.type.js";
 
 export const authorize = (...allowedRoles: MemberRole[]) => {
   return (req: Request, _res: Response, next: NextFunction): void => {

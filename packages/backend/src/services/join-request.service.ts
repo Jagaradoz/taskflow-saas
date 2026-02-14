@@ -1,15 +1,17 @@
-// Local
+// Modules
+import { memberRepository } from "../repositories/member.repository.js";
 import { membershipRequestRepository } from "../repositories/membership-request.repository.js";
-import { memberRepository } from "../repositories/member-repository.js";
-import { orgRepository } from "../repositories/org-repository.js";
-import { cacheService, cacheKeys } from "./cache-service.js";
+import { orgRepository } from "../repositories/org.repository.js";
+import { cacheService, cacheKeys } from "./cache.service.js";
 import { withTransaction } from "../utils/transaction.js";
 import {
   NotFoundError,
   ForbiddenError,
   ValidationError,
 } from "../utils/errors.js";
-import type { MembershipRequestStatus } from "../types/membership-request.js";
+
+// Types
+import type { MembershipRequestStatus } from "../types/membership-request.type.js";
 
 export const joinRequestService = {
   async createRequest(orgSlug: string, userId: string, message?: string) {

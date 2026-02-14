@@ -1,26 +1,26 @@
 import "dotenv/config";
 
-// Libraries
+// Third-party
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 
-// Local
-import { env } from "./config/env.js";
-import { logger } from "./config/logger.js";
-import { pool } from "./config/db.js";
-import { errorHandler } from "./middleware/error.middleware.js";
-import { sessionMiddleware } from "./config/session.js";
+// Config
+import { env } from "./config/env.config.js";
+import { logger } from "./config/logger.config.js";
+import { pool } from "./config/db.config.js";
+import { sessionMiddleware } from "./config/session.config.js";
 
-// Endpoints
-import { authRoutes } from "./routes/auth-routes.js";
-import { memberRoutes } from "./routes/member-routes.js";
-import { orgRoutes } from "./routes/org-routes.js";
-import { systemRoutes } from "./routes/system-routes.js";
-import { taskRoutes } from "./routes/task-routes.js";
-import { inviteRoutes } from "./routes/invite.routes.js";
-import { joinRequestRoutes } from "./routes/join-request.routes.js";
+// Modules
+import { errorHandler } from "./middleware/error.middleware.js";
+import { authRoutes } from "./routes/auth.route.js";
+import { inviteRoutes } from "./routes/invite.route.js";
+import { joinRequestRoutes } from "./routes/join-request.route.js";
+import { memberRoutes } from "./routes/member.route.js";
+import { orgRoutes } from "./routes/org.route.js";
+import { systemRoutes } from "./routes/system.route.js";
+import { taskRoutes } from "./routes/task.route.js";
 
 const app = express();
 
@@ -58,7 +58,7 @@ const authLimiter = rateLimit({
   },
 });
 
-// Middlewares
+// Middleware
 app.use(sessionMiddleware);
 app.use("/api", generalLimiter);
 app.use("/api/auth/login", authLimiter);
@@ -85,5 +85,3 @@ app.listen(env.PORT, async () => {
     process.exit(1);
   }
 });
-
-export { app };

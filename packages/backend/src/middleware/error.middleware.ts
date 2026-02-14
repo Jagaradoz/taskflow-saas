@@ -1,4 +1,4 @@
-// Libraries
+// Third-party
 import type {
   ErrorRequestHandler,
   NextFunction,
@@ -6,9 +6,11 @@ import type {
   Response,
 } from "express";
 
-// Local
-import { env } from "../config/env.js";
-import { logger } from "../config/logger.js";
+// Config
+import { env } from "../config/env.config.js";
+import { logger } from "../config/logger.config.js";
+
+// Modules
 import { AppError, ValidationError } from "../utils/errors.js";
 
 export const errorHandler: ErrorRequestHandler = (

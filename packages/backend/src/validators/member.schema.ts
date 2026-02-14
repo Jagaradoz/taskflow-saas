@@ -1,4 +1,4 @@
-// Libraries
+// Third-party
 import { z } from "zod";
 
 export const updateMemberSchema = z.object({

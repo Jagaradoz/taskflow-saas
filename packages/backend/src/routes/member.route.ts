@@ -1,8 +1,11 @@
+// Third-party
 import { Router } from "express";
-import * as memberController from "../controllers/member-controller.js";
+
+// Modules
+import * as memberController from "../controllers/member.controller.js";
 import { authenticate } from "../middleware/auth.middleware.js";
-import { requireTenant } from "../middleware/tenant.middleware.js";
 import { authorize } from "../middleware/authorize.middleware.js";
+import { requireTenant } from "../middleware/tenant.middleware.js";
 
 const router = Router();
 

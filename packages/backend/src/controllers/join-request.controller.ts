@@ -1,4 +1,7 @@
+// Third-party
 import type { Request, Response } from "express";
+
+// Modules
 import { joinRequestService } from "../services/join-request.service.js";
 import {
   createRequestSchema,
@@ -6,7 +9,9 @@ import {
 } from "../validators/join-request.schema.js";
 import { ValidationError, ForbiddenError, UnauthorizedError } from "../utils/errors.js";
 import { sendSuccess, sendError } from "../utils/response.js";
-import "../types/express.js";
+
+// Types
+import "../types/express.type.js";
 
 // @route POST /api/orgs/:slug/requests
 // @desc  Create join request
@@ -15,6 +20,7 @@ export async function create(req: Request, res: Response): Promise<void> {
     const userId = req.user?.id;
     const slug = req.params.slug;
 
+    // Validate user
     if (!userId) {
       throw new UnauthorizedError("User not found in session");
     }
@@ -22,6 +28,7 @@ export async function create(req: Request, res: Response): Promise<void> {
       throw new ValidationError("Organization slug is required");
     }
 
+    // Validate request body
     const parseResult = createRequestSchema.safeParse(req.body);
     if (!parseResult.success) {
       throw new ValidationError(
@@ -33,6 +40,7 @@ export async function create(req: Request, res: Response): Promise<void> {
       );
     }
 
+    // Create a join request
     const request = await joinRequestService.createRequest(
       slug,
       userId,
@@ -52,17 +60,17 @@ export async function list(req: Request, res: Response): Promise<void> {
     const sessionOrgId = req.currentOrgId;
     const paramOrgId = req.params.orgId;
 
+    // Validate organization
     if (!sessionOrgId) {
       throw new ValidationError("Organization not selected");
     }
-
-    // Ensure the URL parameter matches the session context to avoid confusion
     if (paramOrgId && paramOrgId !== sessionOrgId) {
       throw new ForbiddenError(
         "Organization ID mismatch. You are currently browsing a different organization.",
       );
     }
 
+    // Validate status
     const validStatuses = ["pending", "accepted", "declined", "rejected", "revoked"] as const;
     const statusParam = req.query.status as string | undefined;
     if (statusParam && !validStatuses.includes(statusParam as typeof validStatuses[number])) {
@@ -70,6 +78,8 @@ export async function list(req: Request, res: Response): Promise<void> {
         `Invalid status. Must be one of: ${validStatuses.join(", ")}`,
       );
     }
+
+    // List org requests
     const status = statusParam as typeof validStatuses[number] | undefined;
     const requests = await joinRequestService.listOrgRequests(sessionOrgId, status);
 
@@ -87,6 +97,7 @@ export async function approve(req: Request, res: Response): Promise<void> {
     const resolvedBy = req.user?.id;
     const requestId = req.params.id;
 
+    // Validate organization
     if (!orgId) {
       throw new ValidationError("Organization not selected");
     }
@@ -95,13 +106,18 @@ export async function approve(req: Request, res: Response): Promise<void> {
         "Organization ID mismatch. You are currently browsing a different organization.",
       );
     }
+
+    // Validate user
     if (!resolvedBy) {
       throw new UnauthorizedError("User not found in session");
     }
+
+    // Validate request ID
     if (!requestId) {
       throw new ValidationError("Request ID is required");
     }
 
+    // Validate request body
     const parseResult = approveRequestSchema.safeParse(req.body);
     if (!parseResult.success) {
       throw new ValidationError(
@@ -115,6 +131,7 @@ export async function approve(req: Request, res: Response): Promise<void> {
 
     const { role } = parseResult.data;
 
+    // Approve request
     const membership = await joinRequestService.approveRequest(
       requestId,
       orgId,
@@ -135,6 +152,7 @@ export async function reject(req: Request, res: Response): Promise<void> {
     const resolvedBy = req.user?.id;
     const requestId = req.params.id;
 
+    // Validate organization
     if (!orgId) {
       throw new ValidationError("Organization not selected");
     }
@@ -143,13 +161,18 @@ export async function reject(req: Request, res: Response): Promise<void> {
         "Organization ID mismatch. You are currently browsing a different organization.",
       );
     }
+
+    // Validate user
     if (!resolvedBy) {
       throw new UnauthorizedError("User not found in session");
     }
+
+    // Validate request ID
     if (!requestId) {
       throw new ValidationError("Request ID is required");
     }
 
+    // Reject request
     await joinRequestService.rejectRequest(requestId, orgId, resolvedBy);
     sendSuccess(res, { message: "Request rejected successfully" });
   } catch (error) {
@@ -165,10 +188,13 @@ export async function getMyRequests(
 ): Promise<void> {
   try {
     const userId = req.user?.id;
+
+    // Validate user
     if (!userId) {
       throw new UnauthorizedError("User not found in session");
     }
 
+    // Get my requests
     const requests = await joinRequestService.getMyRequests(userId);
 
     sendSuccess(res, { requests });
@@ -184,13 +210,17 @@ export async function cancel(req: Request, res: Response): Promise<void> {
     const userId = req.user?.id;
     const requestId = req.params.id;
 
+    // Validate user
     if (!userId) {
       throw new UnauthorizedError("User not found in session");
     }
+
+    // Validate request ID
     if (!requestId) {
       throw new ValidationError("Request ID is required");
     }
 
+    // Cancel request
     await joinRequestService.cancelRequest(requestId, userId);
 
     sendSuccess(res, { message: "Request cancelled successfully" });

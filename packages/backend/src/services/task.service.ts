@@ -1,8 +1,10 @@
-// Local
-import { taskRepository } from "../repositories/task-repository.js";
+// Modules
+import { taskRepository } from "../repositories/task.repository.js";
 import { NotFoundError, ForbiddenError } from "../utils/errors.js";
-import { cacheService, cacheKeys, cacheTTL } from "./cache-service.js";
-import type { MemberRole } from "../types/membership.js";
+import { cacheService, cacheKeys, cacheTTL } from "./cache.service.js";
+
+// Types
+import type { MemberRole } from "../types/membership.type.js";
 
 export const taskService = {
   async listTasks(orgId: string) {

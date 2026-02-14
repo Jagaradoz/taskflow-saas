@@ -1,15 +1,22 @@
+// Third-party
 import type { Request, Response } from "express";
-import { authService } from "../services/auth-service.js";
+
+// Modules
+import { authService } from "../services/auth.service.js";
 import { registerSchema, loginSchema } from "../validators/auth.schema.js";
 import { ValidationError, UnauthorizedError } from "../utils/errors.js";
 import { sendSuccess, sendError } from "../utils/response.js";
-import "../types/express.js";
+
+// Types
+import "../types/express.type.js";
 
 // @route POST /api/auth/register
 // @desc  Register new user (public)
 export async function register(req: Request, res: Response): Promise<void> {
   try {
     const parseResult = registerSchema.safeParse(req.body);
+
+    // Validate request body
     if (!parseResult.success) {
       throw new ValidationError(
         "Validation failed",
@@ -20,6 +27,7 @@ export async function register(req: Request, res: Response): Promise<void> {
       );
     }
 
+    // Register user
     const user = await authService.register(parseResult.data);
     req.session.userId = user.id;
 
@@ -34,6 +42,8 @@ export async function register(req: Request, res: Response): Promise<void> {
 export async function login(req: Request, res: Response): Promise<void> {
   try {
     const parseResult = loginSchema.safeParse(req.body);
+
+    // Validate request body
     if (!parseResult.success) {
       throw new ValidationError(
         "Validation failed",
@@ -44,6 +54,7 @@ export async function login(req: Request, res: Response): Promise<void> {
       );
     }
 
+    // Login user
     const user = await authService.login(parseResult.data);
     req.session.userId = user.id;
 
@@ -56,6 +67,7 @@ export async function login(req: Request, res: Response): Promise<void> {
 // @route POST /api/auth/logout
 // @desc  Logout (authenticated)
 export function logout(req: Request, res: Response): void {
+  // Logout user
   req.session.destroy((err) => {
     if (err) {
       sendError(err, res, "logout");
@@ -72,10 +84,13 @@ export function logout(req: Request, res: Response): void {
 export async function me(req: Request, res: Response): Promise<void> {
   try {
     const userId = req.user?.id;
+
+    // Validate user
     if (!userId) {
       throw new UnauthorizedError("User not found in session");
     }
 
+    // Get current user
     const user = await authService.getCurrentUser(userId);
     const currentOrgId = req.session.currentOrgId;
 

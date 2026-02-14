@@ -1,4 +1,4 @@
-// Libraries
+// Third-party
 import { Router } from "express";
 
 const router = Router();

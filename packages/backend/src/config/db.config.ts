@@ -1,9 +1,9 @@
-// Libraries
+// Third-party
 import pg from "pg";
 
-// Local
-import { env } from "./env.js";
-import { logger } from "./logger.js";
+// Config
+import { env } from "./env.config.js";
+import { logger } from "./logger.config.js";
 
 export const pool = new pg.Pool({
   connectionString: env.DATABASE_URL,

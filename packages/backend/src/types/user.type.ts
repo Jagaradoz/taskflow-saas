@@ -1,4 +1,4 @@
-import type { MemberRole } from "./membership.js";
+import type { MemberRole } from "./membership.type.js";
 
 export interface User {
   id: string;

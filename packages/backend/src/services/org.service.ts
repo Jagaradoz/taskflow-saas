@@ -1,16 +1,18 @@
-// Libraries
+// Third-party
 import { nanoid } from "nanoid";
 
-// Local
-import { orgRepository } from "../repositories/org-repository.js";
-import { memberRepository } from "../repositories/member-repository.js";
+// Modules
+import { memberRepository } from "../repositories/member.repository.js";
+import { orgRepository } from "../repositories/org.repository.js";
 import {
   NotFoundError,
   ForbiddenError,
   ValidationError,
 } from "../utils/errors.js";
-import { cacheService, cacheKeys } from "./cache-service.js";
+import { cacheService, cacheKeys } from "./cache.service.js";
 import { withTransaction } from "../utils/transaction.js";
+
+// Types
 import type {
   CreateOrgInput,
   UpdateOrgInput,
@@ -111,7 +113,7 @@ export const orgService = {
     return org;
   },
 
-  async deleteOrg(orgId: string, userId: string) {
+  async deleteOrg(orgId: string) {
     const org = await orgRepository.findById(orgId);
     if (!org) {
       throw new NotFoundError("Organization not found");

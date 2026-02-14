@@ -1,4 +1,7 @@
-import { pool } from "../config/db.js";
+// Config
+import { pool } from "../config/db.config.js";
+
+// Types
 import type { PoolClient } from "pg";
 
 export type Queryable = PoolClient | typeof pool;
