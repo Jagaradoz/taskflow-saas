@@ -1,5 +1,6 @@
+import { Check,X } from 'lucide-react';
 import { useCallback } from 'react';
-import { X, Check } from 'lucide-react';
+
 import type { MembershipRequestWithUser } from '@/types/membership-request';
 
 interface RequestListProps {

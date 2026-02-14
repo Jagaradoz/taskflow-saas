@@ -1,14 +1,15 @@
-import { NavLink, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard,
-  Users,
-  Settings,
-  Mail,
   Inbox,
-  UserPlus,
+  LayoutDashboard,
   LogOut,
+  Mail,
+  Settings,
+  UserPlus,
+  Users,
   X,
 } from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
+
 import { useAuthQuery, useLogoutMutation } from '@/features/auth/hooks/use-auth';
 
 interface SidebarProps {

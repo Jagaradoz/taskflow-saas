@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
 import { Alert, Snackbar } from '@mui/material';
+import { useCallback, useEffect, useState } from 'react';
+
 import { registerErrorNotifier } from '@/lib/notifications';
 
 export function AppSnackbarHost(): JSX.Element {

@@ -1,4 +1,5 @@
 import { Navigate, Outlet } from "react-router-dom";
+
 import { useAuthQuery } from '@/features/auth/hooks/use-auth';
 
 export function GuestRoute(): JSX.Element {

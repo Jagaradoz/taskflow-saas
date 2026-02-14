@@ -1,5 +1,6 @@
+import { Circle, CircleCheck, Pencil,Pin, PinOff, Trash2 } from 'lucide-react';
 import { useCallback } from 'react';
-import { CircleCheck, Circle, Trash2, Pin, PinOff, Pencil } from 'lucide-react';
+
 import type { Task } from '../../../types/task';
 
 interface TaskRowProps {

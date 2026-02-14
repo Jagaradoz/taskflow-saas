@@ -1,8 +1,10 @@
-import { useState, useCallback } from "react";
+import { Alert,Box, Button, TextField } from "@mui/material";
 import type { FormEvent } from "react";
+import { useCallback,useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, TextField, Alert } from "@mui/material";
+
 import { ApiError } from '@/types/api';
+
 import { useRegisterMutation } from '../hooks/use-auth';
 
 export function RegisterForm(): JSX.Element {

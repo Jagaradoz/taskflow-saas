@@ -1,4 +1,5 @@
 import { Menu } from 'lucide-react';
+
 import { OrgSwitcher } from '../../features/orgs/components/OrgSwitcher';
 
 interface TopBarProps {

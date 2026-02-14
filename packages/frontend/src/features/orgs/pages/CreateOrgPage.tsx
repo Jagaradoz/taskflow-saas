@@ -1,8 +1,10 @@
-import { useState, useMemo, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Building2 } from 'lucide-react';
-import { ApiError } from '@/types/api';
+import { useCallback,useMemo, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+
 import { useAuthQuery } from '@/features/auth/hooks/use-auth';
+import { ApiError } from '@/types/api';
+
 import { useCreateOrganizationMutation } from '../hooks/use-orgs';
 
 function generateSlug(name: string): string {

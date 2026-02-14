@@ -1,5 +1,6 @@
-import { useState, useCallback, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
+import { useCallback,useState } from 'react';
+
 import type { Task } from '../../../types/task';
 
 interface EditTaskDialogProps {
@@ -17,13 +18,13 @@ export const EditTaskDialog: React.FC<EditTaskDialogProps> = ({
 }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [prevTaskId, setPrevTaskId] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (task) {
-      setTitle(task.title);
-      setDescription(task.description ?? '');
-    }
-  }, [task]);
+  if (task && task.id !== prevTaskId) {
+    setPrevTaskId(task.id);
+    setTitle(task.title);
+    setDescription(task.description ?? '');
+  }
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {

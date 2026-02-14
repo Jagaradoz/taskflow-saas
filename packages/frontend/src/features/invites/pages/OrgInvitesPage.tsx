@@ -1,9 +1,11 @@
-import { useState, useCallback } from 'react';
 import { Plus } from 'lucide-react';
-import { useDashboardContext } from '../../../hooks/useDashboardContext';
-import { InviteList } from '../components/InviteList';
-import { CreateInviteDialog } from '../components/CreateInviteDialog';
+import { useCallback,useState } from 'react';
+
 import { useAuthQuery } from '@/features/auth/hooks/use-auth';
+
+import { useDashboardContext } from '../../../hooks/useDashboardContext';
+import { CreateInviteDialog } from '../components/CreateInviteDialog';
+import { InviteList } from '../components/InviteList';
 import { useCreateInviteMutation, useOrgInvitesQuery, useRevokeInviteMutation } from '../hooks/use-invites';
 
 const OrgInvitesPage: React.FC = () => {

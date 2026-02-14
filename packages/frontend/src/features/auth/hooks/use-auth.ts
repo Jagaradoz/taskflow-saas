@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+
 import { authApi, type AuthMeResponse } from '../api/auth-api';
 
 export const authQueryKey = ['auth', 'me'] as const;

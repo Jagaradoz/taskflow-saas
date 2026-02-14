@@ -1,8 +1,10 @@
+import { Building2, LogOut, Plus, Search, Users } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Building2, Search, LogOut, Plus, Users } from 'lucide-react';
-import { useListOrganizationsQuery } from '../hooks/use-orgs';
+
 import { useLogoutMutation } from '@/features/auth/hooks/use-auth';
+
+import { useListOrganizationsQuery } from '../hooks/use-orgs';
 
 export const NoOrgState: React.FC = () => {
   const navigate = useNavigate();

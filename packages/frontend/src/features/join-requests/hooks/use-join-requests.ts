@@ -1,6 +1,8 @@
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { joinRequestsApi } from '../api/join-requests-api';
+
 import { authQueryKey } from '@/features/auth/hooks/use-auth';
+
+import { joinRequestsApi } from '../api/join-requests-api';
 
 export function orgRequestsQueryKey(orgId: string) {
   return ['org-requests', orgId] as const;

@@ -1,6 +1,7 @@
+import { Box, Button, Typography } from '@mui/material';
 import { useMemo } from 'react';
 import { isRouteErrorResponse, useNavigate, useRouteError } from 'react-router-dom';
-import { Box, Button, Typography } from '@mui/material';
+
 import { getErrorMessage } from '@/lib/notifications';
 
 export function RouteErrorBoundary(): JSX.Element {

@@ -1,14 +1,16 @@
-import { useState, useCallback, useMemo, useEffect } from 'react';
 import {
   Dialog,
-  DialogTitle,
   DialogContent,
+  DialogTitle,
 } from '@mui/material';
 import { AlertTriangle } from 'lucide-react';
-import { useDashboardContext } from '../../../hooks/useDashboardContext';
+import { useCallback,useMemo, useState } from 'react';
+
 import { useAuthQuery } from '@/features/auth/hooks/use-auth';
-import { useDeleteOrganizationMutation, useOrganizationQuery, useUpdateOrganizationMutation } from '../hooks/use-orgs';
 import { ApiError } from '@/types/api';
+
+import { useDashboardContext } from '../../../hooks/useDashboardContext';
+import { useDeleteOrganizationMutation, useOrganizationQuery, useUpdateOrganizationMutation } from '../hooks/use-orgs';
 
 function generateSlug(name: string): string {
   return name
@@ -34,11 +36,13 @@ const SettingsPage: React.FC = () => {
   const [name, setName] = useState(org?.name ?? '');
   const [description, setDescription] = useState(org?.description ?? '');
   const [saved, setSaved] = useState(false);
+  const [prevOrg, setPrevOrg] = useState({ name: org?.name, description: org?.description });
 
-  useEffect(() => {
+  if (org?.name !== prevOrg.name || org?.description !== prevOrg.description) {
+    setPrevOrg({ name: org?.name, description: org?.description });
     setName(org?.name ?? '');
     setDescription(org?.description ?? '');
-  }, [org?.name, org?.description]);
+  }
 
   const nameChanged = name.trim() !== (org?.name ?? '');
   const slugPreview = useMemo(() => generateSlug(name.trim()), [name]);

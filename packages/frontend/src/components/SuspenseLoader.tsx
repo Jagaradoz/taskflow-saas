@@ -1,6 +1,6 @@
-import { Suspense } from 'react';
-import type { ReactNode } from 'react';
 import { Box, CircularProgress } from '@mui/material';
+import type { ReactNode } from 'react';
+import { Suspense } from 'react';
 
 interface SuspenseLoaderProps {
   children: ReactNode;

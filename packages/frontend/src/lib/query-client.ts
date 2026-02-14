@@ -1,6 +1,7 @@
 import { QueryClient } from '@tanstack/react-query';
-import { setOnUnauthorized } from '@/lib/api-client';
+
 import { authQueryKey } from '@/features/auth/hooks/use-auth';
+import { setOnUnauthorized } from '@/lib/api-client';
 import { notifyError } from '@/lib/notifications';
 
 export const queryClient = new QueryClient({

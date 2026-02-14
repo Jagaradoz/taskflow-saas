@@ -1,6 +1,8 @@
+import { Box, Link,Typography } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
-import { Box, Typography, Link } from "@mui/material";
+
 import { tokens } from "@/theme";
+
 import { RegisterForm } from "../components/RegisterForm";
 
 export function RegisterPage(): JSX.Element {

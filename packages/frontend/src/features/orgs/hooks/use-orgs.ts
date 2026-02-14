@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { orgsApi } from '../api/orgs-api';
+
 import { authQueryKey } from '@/features/auth/hooks/use-auth';
+
+import { orgsApi } from '../api/orgs-api';
 
 export function orgQueryKey(orgId: string) {
   return ['orgs', orgId] as const;

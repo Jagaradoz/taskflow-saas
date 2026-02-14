@@ -1,6 +1,7 @@
+import { ArrowLeft } from 'lucide-react';
 import { useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+
 import { RequestList } from '../components/RequestList';
 import { useCancelRequestMutation, useMyRequestsQuery } from '../hooks/use-join-requests';
 

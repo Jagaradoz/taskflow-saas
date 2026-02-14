@@ -1,12 +1,14 @@
+/* eslint-disable react-refresh/only-export-components */
 import { lazy } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import { SuspenseLoader } from "@/components/SuspenseLoader";
-import { RouteErrorBoundary } from "@/components/RouteErrorBoundary";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
+
 import { GuestRoute } from "@/components/GuestRoute";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { RouteErrorBoundary } from "@/components/RouteErrorBoundary";
+import { SuspenseLoader } from "@/components/SuspenseLoader";
+import { useAuthQuery } from "@/features/auth/hooks/use-auth";
 import { NoOrgState } from "@/features/orgs/components/NoOrgState";
-import { useAuthQuery } from '@/features/auth/hooks/use-auth';
 
 // Lazy-loaded pages
 const LoginPage = lazy(() => import("@/features/auth/pages/LoginPage"));
@@ -33,7 +35,7 @@ function AppOrgRedirect(): JSX.Element {
 }
 
 export const router = createBrowserRouter([
-  // Guest-only routes (redirect to /app/:orgId if logged in)
+  // Guest-only routes
   {
     element: (
       <SuspenseLoader>

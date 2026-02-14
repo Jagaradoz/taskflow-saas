@@ -1,11 +1,13 @@
-import { useState, useCallback } from 'react';
 import { Plus } from 'lucide-react';
+import { useCallback,useState } from 'react';
+
+import { useAuthQuery } from '@/features/auth/hooks/use-auth';
+import { useCreateInviteMutation, useOrgInvitesQuery } from '@/features/invites/hooks/use-invites';
+
 import { useDashboardContext } from '../../../hooks/useDashboardContext';
 import { CreateInviteDialog } from '../../invites/components/CreateInviteDialog';
 import { MemberTable } from '../components/MemberTable';
-import { useAuthQuery } from '@/features/auth/hooks/use-auth';
 import { useMembersQuery, useRemoveMemberMutation } from '../hooks/use-members';
-import { useCreateInviteMutation, useOrgInvitesQuery } from '@/features/invites/hooks/use-invites';
 
 const MembersPage: React.FC = () => {
   const { currentOrgId } = useDashboardContext();

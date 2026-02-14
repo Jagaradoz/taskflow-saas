@@ -1,7 +1,9 @@
 import { useCallback } from 'react';
+
+import { useAuthQuery } from '@/features/auth/hooks/use-auth';
+
 import { useDashboardContext } from '../../../hooks/useDashboardContext';
 import { RequestList } from '../components/RequestList';
-import { useAuthQuery } from '@/features/auth/hooks/use-auth';
 import { useApproveRequestMutation, useOrgRequestsQuery, useRejectRequestMutation } from '../hooks/use-join-requests';
 
 const OrgRequestsPage: React.FC = () => {

@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+
 import { InviteList } from '../components/InviteList';
 import { useAcceptInviteMutation, useDeclineInviteMutation, useMyInvitesQuery } from '../hooks/use-invites';
 

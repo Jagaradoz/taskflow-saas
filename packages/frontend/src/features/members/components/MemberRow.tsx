@@ -1,5 +1,6 @@
-import { useCallback } from 'react';
 import { X } from 'lucide-react';
+import { useCallback } from 'react';
+
 import type { Membership } from '../../../types/membership';
 
 interface MemberRowProps {

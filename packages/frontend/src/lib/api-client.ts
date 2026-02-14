@@ -1,5 +1,5 @@
+import type { ApiErrorResponse,ApiSuccessResponse } from '@/types/api';
 import { ApiError } from '@/types/api';
-import type { ApiSuccessResponse, ApiErrorResponse } from '@/types/api';
 
 /**
  * Thin wrapper around native `fetch`.

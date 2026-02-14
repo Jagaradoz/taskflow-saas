@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Outlet, Navigate, useNavigate, useParams } from 'react-router-dom';
-import { Sidebar } from './Sidebar';
-import { TopBar } from './TopBar';
+import { Navigate, Outlet, useNavigate, useParams } from 'react-router-dom';
+
 import { useAuthQuery } from '@/features/auth/hooks/use-auth';
 import { useSwitchOrganizationMutation } from '@/features/orgs/hooks/use-orgs';
+
+import { Sidebar } from './Sidebar';
+import { TopBar } from './TopBar';
 
 export const DashboardLayout: React.FC = () => {
   const { data } = useAuthQuery();
@@ -11,11 +13,11 @@ export const DashboardLayout: React.FC = () => {
   const { orgId } = useParams<{ orgId: string }>();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const switchOrgMutation = useSwitchOrganizationMutation();
-  const [orgReady, setOrgReady] = useState(false);
   const switchingOrgIdRef = useRef<string | null>(null);
 
   const auth = data?.user;
   const currentOrgId = data?.currentOrgId;
+  const orgReady = currentOrgId === orgId;
 
   const handleSwitchOrg = useCallback(async (nextOrgId: string) => {
     await switchOrgMutation.mutateAsync(nextOrgId);
@@ -40,7 +42,6 @@ export const DashboardLayout: React.FC = () => {
 
     if (currentOrgId === orgId) {
       switchingOrgIdRef.current = null;
-      setOrgReady(true);
       return;
     }
 
@@ -50,12 +51,8 @@ export const DashboardLayout: React.FC = () => {
 
     // Need to switch org on the backend
     switchingOrgIdRef.current = orgId;
-    setOrgReady(false);
     switchOrgMutation
       .mutateAsync(orgId)
-      .then(() => {
-        setOrgReady(true);
-      })
       .catch(() => {
         // If switch fails (e.g. not a member), redirect
         navigate('/no-org', { replace: true });
