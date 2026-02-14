@@ -1,28 +1,18 @@
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { getAuthState } from '../../../mock/auth';
-import { getMyRequests, resolveRequest } from '../../../mock/membership-requests';
 import { RequestList } from '../components/RequestList';
-import type { MembershipRequestWithUser } from '../../../mock/membership-requests';
+import { useCancelRequestMutation, useMyRequestsQuery } from '../hooks/use-join-requests';
 
 const MyRequestsPage: React.FC = () => {
-  const auth = getAuthState()!;
-
-  const [requests, setRequests] = useState<MembershipRequestWithUser[]>(() =>
-    getMyRequests(auth.user.id),
-  );
-
-  const refreshRequests = useCallback(() => {
-    setRequests(getMyRequests(auth.user.id));
-  }, [auth.user.id]);
+  const { data: requests = [] } = useMyRequestsQuery();
+  const cancelRequestMutation = useCancelRequestMutation();
 
   const handleCancel = useCallback(
-    (requestId: string) => {
-      resolveRequest(requestId, auth.user.id, 'declined');
-      refreshRequests();
+    async (requestId: string) => {
+      await cancelRequestMutation.mutateAsync(requestId);
     },
-    [auth.user.id, refreshRequests],
+    [cancelRequestMutation],
   );
 
   return (

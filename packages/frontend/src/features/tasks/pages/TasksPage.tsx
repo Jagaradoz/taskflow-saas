@@ -1,57 +1,47 @@
 import { useState, useCallback } from 'react';
 import { Plus } from 'lucide-react';
 import { useDashboardContext } from '../../../hooks/useDashboardContext';
-import { getAuthState } from '../../../mock/auth';
-import { getTasksByOrg, createTask, updateTask, deleteTask } from '../../../mock/tasks';
-import { getMembersByOrg } from '../../../mock/members';
 import { TaskStatsCards } from '../components/TaskStatsCards';
 import { TaskTable } from '../components/TaskTable';
 import { CreateTaskDialog } from '../components/CreateTaskDialog';
-import type { Task } from '../../../types/task';
-import type { Membership } from '../../../types/membership';
+import { useTasksQuery, useCreateTaskMutation, useUpdateTaskMutation, useDeleteTaskMutation } from '../hooks/use-tasks';
+import { useMembersQuery } from '@/features/members/hooks/use-members';
 
 const TasksPage: React.FC = () => {
   const { currentOrgId } = useDashboardContext();
-  const auth = getAuthState()!;
-
-  const [tasks, setTasks] = useState<Task[]>(() => getTasksByOrg(currentOrgId));
-  const [members] = useState<Membership[]>(() => getMembersByOrg(currentOrgId));
+  const { data: tasks = [] } = useTasksQuery(currentOrgId);
+  const { data: members = [] } = useMembersQuery(currentOrgId);
+  const createTaskMutation = useCreateTaskMutation(currentOrgId);
+  const updateTaskMutation = useUpdateTaskMutation(currentOrgId);
+  const deleteTaskMutation = useDeleteTaskMutation(currentOrgId);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const refreshTasks = useCallback(() => {
-    setTasks(getTasksByOrg(currentOrgId));
-  }, [currentOrgId]);
-
   const handleCreate = useCallback(
-    (title: string) => {
-      createTask(currentOrgId, auth.user.id, title);
-      refreshTasks();
+    async (title: string) => {
+      await createTaskMutation.mutateAsync({ title });
     },
-    [currentOrgId, auth.user.id, refreshTasks],
+    [createTaskMutation],
   );
 
   const handleToggleDone = useCallback(
-    (taskId: string, isDone: boolean) => {
-      updateTask(taskId, { isDone });
-      refreshTasks();
+    async (taskId: string, isDone: boolean) => {
+      await updateTaskMutation.mutateAsync({ taskId, updates: { isDone } });
     },
-    [refreshTasks],
+    [updateTaskMutation],
   );
 
   const handleTogglePin = useCallback(
-    (taskId: string, isPinned: boolean) => {
-      updateTask(taskId, { isPinned });
-      refreshTasks();
+    async (taskId: string, isPinned: boolean) => {
+      await updateTaskMutation.mutateAsync({ taskId, updates: { isPinned } });
     },
-    [refreshTasks],
+    [updateTaskMutation],
   );
 
   const handleDelete = useCallback(
-    (taskId: string) => {
-      deleteTask(taskId);
-      refreshTasks();
+    async (taskId: string) => {
+      await deleteTaskMutation.mutateAsync(taskId);
     },
-    [refreshTasks],
+    [deleteTaskMutation],
   );
 
   return (

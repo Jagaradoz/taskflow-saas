@@ -2,36 +2,30 @@ import { useState, useCallback } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Button, TextField, Alert } from "@mui/material";
-import { mockLogin } from '../../../mock/auth';
+import { ApiError } from '@/types/api';
+import { useLoginMutation } from '../hooks/use-auth';
 
 export function LoginForm(): JSX.Element {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const loginMutation = useLoginMutation();
 
   const handleSubmit = useCallback(
-    (e: FormEvent) => {
+    async (e: FormEvent) => {
       e.preventDefault();
       setError(null);
-      setLoading(true);
 
-      // Simulate async delay
-      setTimeout(() => {
-        const result = mockLogin(email, password);
-
-        if (!result) {
-          setError("Invalid email or password. Try john@example.com");
-          setLoading(false);
-          return;
-        }
-
-        const firstOrg = result.memberships[0];
-        navigate(firstOrg ? `/app/${firstOrg.orgId}` : "/no-org", { replace: true });
-      }, 300);
+      try {
+        await loginMutation.mutateAsync({ email, password });
+        navigate('/app', { replace: true });
+      } catch (err) {
+        const message = err instanceof ApiError ? err.message : 'Failed to login';
+        setError(message);
+      }
     },
-    [email, password, navigate],
+    [email, password, navigate, loginMutation],
   );
 
   return (
@@ -75,10 +69,10 @@ export function LoginForm(): JSX.Element {
         variant="contained"
         color="primary"
         fullWidth
-        disabled={loading}
+        disabled={loginMutation.isPending}
         sx={{ height: 48, fontSize: 13, letterSpacing: 1 }}
       >
-        {loading ? "SIGNING IN..." : "LOGIN"}
+        {loginMutation.isPending ? "SIGNING IN..." : "LOGIN"}
       </Button>
     </Box>
   );

@@ -1,41 +1,30 @@
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useDashboardContext } from '../../../hooks/useDashboardContext';
-import { getAuthState } from '../../../mock/auth';
-import { getMembersByOrg } from '../../../mock/members';
-import { getOrgRequests, resolveRequest } from '../../../mock/membership-requests';
 import { RequestList } from '../components/RequestList';
-import type { MembershipRequestWithUser } from '../../../mock/membership-requests';
+import { useAuthQuery } from '@/features/auth/hooks/use-auth';
+import { useApproveRequestMutation, useOrgRequestsQuery, useRejectRequestMutation } from '../hooks/use-join-requests';
 
 const OrgRequestsPage: React.FC = () => {
   const { currentOrgId } = useDashboardContext();
-  const auth = getAuthState()!;
-
-  const members = getMembersByOrg(currentOrgId);
-  const currentMembership = members.find((m) => m.userId === auth.user.id);
+  const { data: auth } = useAuthQuery();
+  const { data: requests = [] } = useOrgRequestsQuery(currentOrgId);
+  const approveMutation = useApproveRequestMutation(currentOrgId);
+  const rejectMutation = useRejectRequestMutation(currentOrgId);
+  const currentMembership = auth?.user.memberships.find((m) => m.orgId === currentOrgId);
   const isOwner = currentMembership?.role === 'owner';
 
-  const [requests, setRequests] = useState<MembershipRequestWithUser[]>(() =>
-    getOrgRequests(currentOrgId),
-  );
-
-  const refreshRequests = useCallback(() => {
-    setRequests(getOrgRequests(currentOrgId));
-  }, [currentOrgId]);
-
   const handleApprove = useCallback(
-    (requestId: string) => {
-      resolveRequest(requestId, auth.user.id, 'accepted');
-      refreshRequests();
+    async (requestId: string) => {
+      await approveMutation.mutateAsync(requestId);
     },
-    [auth.user.id, refreshRequests],
+    [approveMutation],
   );
 
   const handleReject = useCallback(
-    (requestId: string) => {
-      resolveRequest(requestId, auth.user.id, 'rejected');
-      refreshRequests();
+    async (requestId: string) => {
+      await rejectMutation.mutateAsync(requestId);
     },
-    [auth.user.id, refreshRequests],
+    [rejectMutation],
   );
 
   if (!isOwner) {

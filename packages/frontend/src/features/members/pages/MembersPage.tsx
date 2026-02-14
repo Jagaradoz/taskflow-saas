@@ -1,44 +1,39 @@
 import { useState, useCallback } from 'react';
 import { Plus } from 'lucide-react';
 import { useDashboardContext } from '../../../hooks/useDashboardContext';
-import { getAuthState } from '../../../mock/auth';
-import { getMembersByOrg, removeMember } from '../../../mock/members';
-import {
-  createInvite,
-  getOrgInvites,
-} from '../../../mock/membership-requests';
 import { CreateInviteDialog } from '../../invites/components/CreateInviteDialog';
 import { MemberTable } from '../components/MemberTable';
-import type { Membership } from '../../../types/membership';
+import { useAuthQuery } from '@/features/auth/hooks/use-auth';
+import { useMembersQuery, useRemoveMemberMutation } from '../hooks/use-members';
+import { useCreateInviteMutation, useOrgInvitesQuery } from '@/features/invites/hooks/use-invites';
 
 const MembersPage: React.FC = () => {
   const { currentOrgId } = useDashboardContext();
-  const auth = getAuthState()!;
-
-  const [members, setMembers] = useState<Membership[]>(() =>
-    getMembersByOrg(currentOrgId),
-  );
+  const { data: auth } = useAuthQuery();
+  const { data: members = [] } = useMembersQuery(currentOrgId);
+  const { data: invites = [] } = useOrgInvitesQuery(currentOrgId);
+  const removeMemberMutation = useRemoveMemberMutation(currentOrgId);
+  const createInviteMutation = useCreateInviteMutation(currentOrgId);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [inviteError, setInviteError] = useState<string | null>(null);
 
-  const currentMembership = members.find((m) => m.userId === auth.user.id);
+  const currentMembership = auth?.user.memberships.find((m) => m.orgId === currentOrgId);
   const isOwner = currentMembership?.role === 'owner';
 
   const handleRemove = useCallback(
-    (membershipId: string) => {
-      removeMember(membershipId);
-      setMembers(getMembersByOrg(currentOrgId));
+    async (membershipId: string) => {
+      await removeMemberMutation.mutateAsync(membershipId);
     },
-    [currentOrgId],
+    [removeMemberMutation],
   );
 
   const handleInvite = useCallback(
-    (email: string) => {
+    async (email: string) => {
       setInviteError(null);
 
       const normalizedEmail = email.toLowerCase();
 
-      const alreadyMember = getMembersByOrg(currentOrgId).some(
+      const alreadyMember = members.some(
         (membership) =>
           membership.user?.email?.toLowerCase() === normalizedEmail,
       );
@@ -47,7 +42,7 @@ const MembersPage: React.FC = () => {
         return;
       }
 
-      const alreadyInvited = getOrgInvites(currentOrgId).some(
+      const alreadyInvited = invites.some(
         (invite) =>
           invite.user?.email?.toLowerCase() === normalizedEmail &&
           invite.status === 'pending',
@@ -57,16 +52,18 @@ const MembersPage: React.FC = () => {
         return;
       }
 
-      const result = createInvite(currentOrgId, email, auth.user.id);
-      if (!result) {
-        setInviteError('User not found. They must have a TaskFlow account.');
+      try {
+        await createInviteMutation.mutateAsync(email);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to send invite';
+        setInviteError(message);
         return;
       }
 
       setDialogOpen(false);
       setInviteError(null);
     },
-    [currentOrgId, auth.user.id],
+    [members, invites, createInviteMutation],
   );
 
   return (

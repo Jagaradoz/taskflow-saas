@@ -1,34 +1,24 @@
-import { useState, useCallback } from 'react';
-import { getAuthState } from '../../../mock/auth';
-import { getMyInvites, resolveRequest } from '../../../mock/membership-requests';
+import { useCallback } from 'react';
 import { InviteList } from '../components/InviteList';
-import type { MembershipRequestWithUser } from '../../../mock/membership-requests';
+import { useAcceptInviteMutation, useDeclineInviteMutation, useMyInvitesQuery } from '../hooks/use-invites';
 
 const MyInvitesPage: React.FC = () => {
-  const auth = getAuthState()!;
-
-  const [invites, setInvites] = useState<MembershipRequestWithUser[]>(() =>
-    getMyInvites(auth.user.id),
-  );
-
-  const refreshInvites = useCallback(() => {
-    setInvites(getMyInvites(auth.user.id));
-  }, [auth.user.id]);
+  const { data: invites = [] } = useMyInvitesQuery();
+  const acceptInviteMutation = useAcceptInviteMutation();
+  const declineInviteMutation = useDeclineInviteMutation();
 
   const handleAccept = useCallback(
-    (inviteId: string) => {
-      resolveRequest(inviteId, auth.user.id, 'accepted');
-      refreshInvites();
+    async (inviteId: string) => {
+      await acceptInviteMutation.mutateAsync(inviteId);
     },
-    [auth.user.id, refreshInvites],
+    [acceptInviteMutation],
   );
 
   const handleDecline = useCallback(
-    (inviteId: string) => {
-      resolveRequest(inviteId, auth.user.id, 'declined');
-      refreshInvites();
+    async (inviteId: string) => {
+      await declineInviteMutation.mutateAsync(inviteId);
     },
-    [auth.user.id, refreshInvites],
+    [declineInviteMutation],
   );
 
   return (

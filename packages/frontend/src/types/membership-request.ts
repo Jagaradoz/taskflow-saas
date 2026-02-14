@@ -43,3 +43,12 @@ export interface MembershipRequest {
   inviter?: User;
   requester?: User;
 }
+
+export type MembershipRequestWithUser = Omit<
+  MembershipRequest,
+  "org" | "inviter" | "requester" | "invitedUser"
+> & {
+  user?: { name: string; email: string };
+  inviter?: { name: string };
+  org?: { name: string; slug: string };
+};

@@ -1,11 +1,12 @@
 import { lazy } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { SuspenseLoader } from "@/components/SuspenseLoader";
+import { RouteErrorBoundary } from "@/components/RouteErrorBoundary";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { GuestRoute } from "@/components/GuestRoute";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { NoOrgState } from "@/features/orgs/components/NoOrgState";
-import { getAuthState } from "@/mock/auth";
+import { useAuthQuery } from '@/features/auth/hooks/use-auth';
 
 // Lazy-loaded pages
 const LoginPage = lazy(() => import("@/features/auth/pages/LoginPage"));
@@ -22,8 +23,8 @@ const JoinOrgPage = lazy(() => import("@/features/join-requests/pages/JoinOrgPag
 const LandingPage = lazy(() => import("@/features/landing/pages/LandingPage"));
 
 function AppOrgRedirect(): JSX.Element {
-  const auth = getAuthState();
-  const firstOrg = auth?.memberships[0];
+  const { data } = useAuthQuery();
+  const firstOrg = data?.user.memberships[0];
   if (!firstOrg) {
     return <Navigate to="/no-org" replace />;
   }
@@ -34,7 +35,12 @@ function AppOrgRedirect(): JSX.Element {
 export const router = createBrowserRouter([
   // Guest-only routes (redirect to /app/:orgId if logged in)
   {
-    element: <GuestRoute />,
+    element: (
+      <SuspenseLoader>
+        <GuestRoute />
+      </SuspenseLoader>
+    ),
+    errorElement: <RouteErrorBoundary />,
     children: [
       {
         path: "/",
@@ -65,7 +71,12 @@ export const router = createBrowserRouter([
 
   // Protected routes (redirect to /login if not logged in)
   {
-    element: <ProtectedRoute />,
+    element: (
+      <SuspenseLoader>
+        <ProtectedRoute />
+      </SuspenseLoader>
+    ),
+    errorElement: <RouteErrorBoundary />,
     children: [
       {
         path: "/app",
@@ -73,7 +84,12 @@ export const router = createBrowserRouter([
       },
       {
         path: "/app/:orgId",
-        element: <DashboardLayout />,
+        element: (
+          <SuspenseLoader>
+            <DashboardLayout />
+          </SuspenseLoader>
+        ),
+        errorElement: <RouteErrorBoundary />,
         children: [
           {
             index: true,

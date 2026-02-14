@@ -1,8 +1,7 @@
 import { useState, useCallback } from 'react';
 import { Menu, MenuItem } from '@mui/material';
 import { ChevronDown, Plus } from 'lucide-react';
-import { getAuthState } from '../../../mock/auth';
-import type { AuthState } from '../../../mock/auth';
+import { useAuthQuery } from '@/features/auth/hooks/use-auth';
 
 interface OrgSwitcherProps {
   currentOrgId: string;
@@ -16,9 +15,10 @@ export const OrgSwitcher: React.FC<OrgSwitcherProps> = ({
   onCreate,
 }) => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const auth = getAuthState() as AuthState;
+  const { data } = useAuthQuery();
+  const memberships = data?.user.memberships ?? [];
 
-  const currentOrg = auth.memberships.find((m) => m.orgId === currentOrgId);
+  const currentOrg = memberships.find((m) => m.orgId === currentOrgId);
 
   const handleOpen = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(e.currentTarget);
@@ -62,7 +62,7 @@ export const OrgSwitcher: React.FC<OrgSwitcherProps> = ({
           },
         }}
       >
-        {auth.memberships.map((m) => (
+        {memberships.map((m) => (
           <MenuItem
             key={m.orgId}
             selected={m.orgId === currentOrgId}

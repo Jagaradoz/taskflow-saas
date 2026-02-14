@@ -1,9 +1,9 @@
 import { useState, useMemo, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Building2 } from 'lucide-react';
-import { getAuthState } from '../../../mock/auth';
-import { createOrganization } from '../../../mock/organizations';
-import { load } from '../../../mock/store';
+import { ApiError } from '@/types/api';
+import { useAuthQuery } from '@/features/auth/hooks/use-auth';
+import { useCreateOrganizationMutation } from '../hooks/use-orgs';
 
 function generateSlug(name: string): string {
   return name
@@ -15,7 +15,8 @@ function generateSlug(name: string): string {
 
 const CreateOrgPage: React.FC = () => {
   const navigate = useNavigate();
-  const auth = getAuthState()!;
+  const { data: auth } = useAuthQuery();
+  const createOrgMutation = useCreateOrganizationMutation();
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -24,13 +25,13 @@ const CreateOrgPage: React.FC = () => {
 
   const baseSlug = useMemo(() => generateSlug(name.trim()), [name]);
 
-  const existingOrgIds = new Set(auth.memberships.map((m) => m.orgId));
-  const backToPath = auth.memberships[0]
-    ? `/app/${auth.memberships[0].orgId}`
+  const existingOrgIds = new Set(auth?.user.memberships.map((m) => m.orgId) ?? []);
+  const backToPath = auth?.user.memberships[0]
+    ? `/app/${auth.user.memberships[0].orgId}`
     : '/no-org';
 
   const handleCreate = useCallback(
-    (e: React.FormEvent) => {
+    async (e: React.FormEvent) => {
       e.preventDefault();
       setError(null);
 
@@ -40,30 +41,26 @@ const CreateOrgPage: React.FC = () => {
         return;
       }
 
-      const store = load();
-      let slug = generateSlug(trimmedName);
-      if (!slug) {
+      if (!baseSlug) {
         setError('Please enter a valid organization name.');
         return;
       }
 
-      let suffix = 2;
-      while (store.organizations.some((org) => org.slug === slug)) {
-        slug = `${baseSlug}-${suffix}`;
-        suffix += 1;
-      }
-
       setSaving(true);
-      const org = createOrganization(
-        auth.user.id,
-        trimmedName,
-        slug,
-        description.trim() || undefined,
-      );
-      setSaving(false);
-      navigate(`/app/${org.id}`, { replace: true });
+      try {
+        const result = await createOrgMutation.mutateAsync({
+          name: trimmedName,
+          description: description.trim() || undefined,
+        });
+        navigate(`/app/${result.organization.id}`, { replace: true });
+      } catch (err) {
+        const message = err instanceof ApiError ? err.message : 'Failed to create organization.';
+        setError(message);
+      } finally {
+        setSaving(false);
+      }
     },
-    [auth.user.id, baseSlug, description, name, navigate],
+    [baseSlug, createOrgMutation, description, name, navigate],
   );
 
   return (

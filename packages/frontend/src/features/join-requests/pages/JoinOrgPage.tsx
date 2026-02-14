@@ -1,23 +1,13 @@
 import { useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Send, CheckCircle, AlertCircle } from 'lucide-react';
-import { getAuthState } from '../../../mock/auth';
-import { createJoinRequest } from '../../../mock/membership-requests';
-import { load } from '../../../mock/store';
+import { ArrowLeft, Send, CheckCircle, AlertCircle, Building2 } from 'lucide-react';
+import { useCreateJoinRequestMutation } from '../hooks/use-join-requests';
 
 type SubmitState = 'idle' | 'success' | 'error';
 
 const JoinOrgPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const auth = getAuthState()!;
-
-  const store = load();
-  const org = store.organizations.find((o) => o.slug === slug);
-  const isAlreadyMember = org
-    ? store.memberships.some(
-        (m) => m.orgId === org.id && m.userId === auth.user.id,
-      )
-    : false;
+  const createJoinRequestMutation = useCreateJoinRequestMutation();
 
   const [message, setMessage] = useState('');
   const [submitState, setSubmitState] = useState<SubmitState>('idle');
@@ -26,17 +16,19 @@ const JoinOrgPage: React.FC = () => {
   const handleSubmit = useCallback(() => {
     if (!slug) return;
 
-    const result = createJoinRequest(slug, auth.user.id, message || undefined);
-    if (result) {
-      setSubmitState('success');
-    } else {
-      setSubmitState('error');
-      setErrorMsg('Organization not found.');
-    }
-  }, [slug, auth.user.id, message]);
+    createJoinRequestMutation
+      .mutateAsync({ slug, message: message || undefined })
+      .then(() => {
+        setSubmitState('success');
+      })
+      .catch((err: unknown) => {
+        const fallback = 'Unable to submit join request.';
+        setSubmitState('error');
+        setErrorMsg(err instanceof Error ? err.message : fallback);
+      });
+  }, [slug, message, createJoinRequestMutation]);
 
-  // Org not found
-  if (!org) {
+  if (!slug) {
     return (
       <div className="flex min-h-screen flex-col bg-bg-page">
         <div className="flex h-14 items-center border-b border-border px-4 sm:px-6">
@@ -51,10 +43,10 @@ const JoinOrgPage: React.FC = () => {
         <div className="flex flex-1 flex-col items-center justify-center gap-4">
           <AlertCircle size={40} className="text-red-error" />
           <h2 className="font-display text-2xl font-bold text-white">
-            ORGANIZATION NOT FOUND
+            INVALID JOIN LINK
           </h2>
           <p className="px-4 text-center font-mono text-sm text-gray-500">
-            No organization with slug "{slug}" exists.
+            Join URL is missing organization slug.
           </p>
         </div>
       </div>
@@ -81,28 +73,16 @@ const JoinOrgPage: React.FC = () => {
           <span className="font-mono text-[11px] font-medium uppercase tracking-[1px] text-gray-500">
             ORGANIZATION
           </span>
-          <h1 className="font-display text-2xl font-bold text-white sm:text-3xl">
-            {org.name}
-          </h1>
-          {org.description && (
-            <p className="font-mono text-sm font-medium text-gray-500">
-              {org.description}
-            </p>
-          )}
-          <span className="font-mono text-[11px] font-medium text-gray-400">
-            /{org.slug}
-          </span>
-        </div>
-
-        {/* Already a member */}
-        {isAlreadyMember && (
-          <div className="flex items-center gap-3 border border-green-primary/20 bg-green-primary/5 p-4">
-            <CheckCircle size={18} className="shrink-0 text-green-primary" />
-            <span className="font-mono text-sm font-medium text-green-primary">
-              You are already a member of this organization.
-            </span>
+          <div className="flex items-center gap-3">
+            <Building2 size={18} className="text-gray-500" />
+            <h1 className="font-display text-2xl font-bold text-white sm:text-3xl">
+              /{slug}
+            </h1>
           </div>
-        )}
+          <p className="font-mono text-sm font-medium text-gray-500">
+            Submit a request to join this organization. Owners will review it.
+          </p>
+        </div>
 
         {/* Success state */}
         {submitState === 'success' && (
@@ -130,8 +110,8 @@ const JoinOrgPage: React.FC = () => {
           </div>
         )}
 
-        {/* Form — only show when idle and not already a member */}
-        {submitState === 'idle' && !isAlreadyMember && (
+        {/* Form */}
+        {submitState === 'idle' && (
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
               <label className="font-mono text-[11px] font-medium uppercase tracking-[1px] text-gray-500">
@@ -147,10 +127,11 @@ const JoinOrgPage: React.FC = () => {
             </div>
             <button
               onClick={handleSubmit}
-              className="flex items-center justify-center gap-2 bg-green-primary px-4 py-3 font-mono text-[11px] font-bold uppercase tracking-wide text-black-on-accent hover:brightness-90"
+              disabled={createJoinRequestMutation.isPending}
+              className="flex items-center justify-center gap-2 bg-green-primary px-4 py-3 font-mono text-[11px] font-bold uppercase tracking-wide text-black-on-accent hover:brightness-90 disabled:opacity-60 disabled:hover:brightness-100"
             >
               <Send size={14} />
-              REQUEST TO JOIN
+              {createJoinRequestMutation.isPending ? 'SENDING...' : 'REQUEST TO JOIN'}
             </button>
           </div>
         )}

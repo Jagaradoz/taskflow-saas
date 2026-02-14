@@ -2,13 +2,17 @@ import { useCallback, useState } from 'react';
 import { Outlet, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
-import { getAuthState } from '../../mock/auth';
+import { useAuthQuery } from '@/features/auth/hooks/use-auth';
+import { useSwitchOrganizationMutation } from '@/features/orgs/hooks/use-orgs';
 
 export const DashboardLayout: React.FC = () => {
-  const auth = getAuthState();
+  const { data } = useAuthQuery();
   const navigate = useNavigate();
   const { orgId } = useParams<{ orgId: string }>();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const switchOrgMutation = useSwitchOrganizationMutation();
+
+  const auth = data?.user;
 
   // Redirect if not authenticated (shouldn't happen — ProtectedRoute catches it)
   if (!auth) return <Navigate to="/login" replace />;
@@ -27,9 +31,10 @@ export const DashboardLayout: React.FC = () => {
     return <Navigate to={`/app/${firstOrg.orgId}`} replace />;
   }
 
-  const handleSwitchOrg = useCallback((nextOrgId: string) => {
+  const handleSwitchOrg = useCallback(async (nextOrgId: string) => {
+    await switchOrgMutation.mutateAsync(nextOrgId);
     navigate(`/app/${nextOrgId}`);
-  }, [navigate]);
+  }, [navigate, switchOrgMutation]);
 
   const handleCreateOrg = useCallback(() => {
     navigate('/orgs/new');

@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -6,9 +6,9 @@ import {
 } from '@mui/material';
 import { AlertTriangle } from 'lucide-react';
 import { useDashboardContext } from '../../../hooks/useDashboardContext';
-import { getAuthState } from '../../../mock/auth';
-import { getOrganization, updateOrganization, deleteOrganization } from '../../../mock/organizations';
-import { getMembersByOrg } from '../../../mock/members';
+import { useAuthQuery } from '@/features/auth/hooks/use-auth';
+import { useDeleteOrganizationMutation, useOrganizationQuery, useUpdateOrganizationMutation } from '../hooks/use-orgs';
+import { ApiError } from '@/types/api';
 
 function generateSlug(name: string): string {
   return name
@@ -20,16 +20,21 @@ function generateSlug(name: string): string {
 
 const SettingsPage: React.FC = () => {
   const { currentOrgId } = useDashboardContext();
-  const auth = getAuthState()!;
-
-  const org = getOrganization(currentOrgId);
-  const members = getMembersByOrg(currentOrgId);
-  const currentMembership = members.find((m) => m.userId === auth.user.id);
+  const { data: auth } = useAuthQuery();
+  const { data: org } = useOrganizationQuery(currentOrgId);
+  const updateOrgMutation = useUpdateOrganizationMutation(currentOrgId);
+  const deleteOrgMutation = useDeleteOrganizationMutation(currentOrgId);
+  const currentMembership = auth?.user.memberships.find((m) => m.orgId === currentOrgId);
   const isOwner = currentMembership?.role === 'owner';
 
   const [name, setName] = useState(org?.name ?? '');
   const [description, setDescription] = useState(org?.description ?? '');
   const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    setName(org?.name ?? '');
+    setDescription(org?.description ?? '');
+  }, [org?.name, org?.description]);
 
   const nameChanged = name.trim() !== (org?.name ?? '');
   const slugPreview = useMemo(() => generateSlug(name.trim()), [name]);
@@ -38,18 +43,24 @@ const SettingsPage: React.FC = () => {
 
   const handleSave = useCallback(() => {
     if (!org || !isOwner) return;
-    updateOrganization(currentOrgId, { name: name.trim(), description: description.trim() || undefined });
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
-  }, [currentOrgId, name, description, org, isOwner]);
+    updateOrgMutation
+      .mutateAsync({ name: name.trim(), description: description.trim() || undefined })
+      .then(() => {
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2000);
+      });
+  }, [description, isOwner, name, org, updateOrgMutation]);
 
   const handleDelete = useCallback(() => {
     if (!org || confirmText !== org.slug) return;
-    deleteOrganization(currentOrgId);
-    setDeleteOpen(false);
-    // Force full reload so DashboardLayout re-evaluates auth/memberships
-    window.location.href = '/';
-  }, [currentOrgId, confirmText, org]);
+    deleteOrgMutation
+      .mutateAsync()
+      .then(() => {
+        setDeleteOpen(false);
+        window.location.href = '/';
+      })
+      .catch((_err: unknown) => {});
+  }, [confirmText, deleteOrgMutation, org]);
 
   if (!org) {
     return (
@@ -129,6 +140,13 @@ const SettingsPage: React.FC = () => {
             {saved && (
               <span className="font-mono text-xs text-green-primary">
                 Changes saved
+              </span>
+            )}
+            {updateOrgMutation.isError && (
+              <span className="font-mono text-xs text-red-error">
+                {updateOrgMutation.error instanceof ApiError
+                  ? updateOrgMutation.error.message
+                  : 'Failed to save changes'}
               </span>
             )}
           </div>

@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { X, Check } from 'lucide-react';
-import type { MembershipRequestWithUser } from '../../../mock/membership-requests';
+import type { MembershipRequestWithUser } from '@/types/membership-request';
 
 interface RequestListProps {
   requests: MembershipRequestWithUser[];

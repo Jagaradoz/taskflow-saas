@@ -8,7 +8,7 @@ import {
   LogOut,
   X,
 } from 'lucide-react';
-import { getAuthState, mockLogout } from '../../mock/auth';
+import { useAuthQuery, useLogoutMutation } from '@/features/auth/hooks/use-auth';
 
 interface SidebarProps {
   currentOrgId: string;
@@ -24,7 +24,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onNavigate,
 }) => {
   const navigate = useNavigate();
-  const auth = getAuthState();
+  const { data } = useAuthQuery();
+  const logoutMutation = useLogoutMutation();
+  const auth = data?.user;
   const dashboardBasePath = `/app/${currentOrgId}`;
   const navItems = [
     { to: dashboardBasePath, label: 'TASKS', icon: LayoutDashboard },
@@ -34,13 +36,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { to: `${dashboardBasePath}/requests`, label: 'REQUESTS', icon: Inbox },
   ] as const;
 
-  const handleLogout = (): void => {
-    mockLogout();
+  const handleLogout = async (): Promise<void> => {
+    await logoutMutation.mutateAsync();
     onNavigate?.();
     navigate('/');
   };
 
-  const initials = auth?.user.name
+  const initials = auth?.name
     .split(' ')
     .map((n) => n[0])
     .join('')
@@ -125,7 +127,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
           <div className="flex min-w-0 flex-col gap-0.5">
             <span className="truncate font-mono text-[13px] font-medium text-white">
-              {auth?.user.name}
+              {auth?.name ?? 'User'}
             </span>
             <span className="font-mono text-[11px] font-medium text-green-primary">
               ONLINE
