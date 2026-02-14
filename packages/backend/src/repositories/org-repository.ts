@@ -5,6 +5,37 @@ import type { Queryable } from "../utils/transaction.js";
 import type { Organization, OrgRow } from "../types/organization.js";
 
 export const orgRepository = {
+  async findAll(
+    query?: string,
+    limit = 20,
+    offset = 0,
+  ): Promise<Organization[]> {
+    const params: unknown[] = [limit, offset];
+    let whereClause = "";
+
+    if (query) {
+      whereClause = "WHERE name ILIKE $3";
+      params.push(`%${query}%`);
+    }
+
+    const result = await pool.query<OrgRow>(
+      `SELECT id, name, slug, description, created_at, updated_at
+       FROM organizations ${whereClause}
+       ORDER BY created_at DESC
+       LIMIT $1 OFFSET $2`,
+      params,
+    );
+
+    return result.rows.map((row) => ({
+      id: row.id,
+      name: row.name,
+      slug: row.slug,
+      description: row.description || null,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    }));
+  },
+
   async findById(id: string): Promise<Organization | null> {
     const result = await pool.query<OrgRow>(
       "SELECT id, name, slug, description, created_at, updated_at FROM organizations WHERE id = $1",

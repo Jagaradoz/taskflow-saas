@@ -5,6 +5,18 @@ import { ValidationError, ForbiddenError, UnauthorizedError } from "../utils/err
 import { sendSuccess, sendError } from "../utils/response.js";
 import "../types/express.js";
 
+// @route GET /api/orgs
+// @desc  List all organizations (authenticated, optional search)
+export async function list(req: Request, res: Response): Promise<void> {
+  try {
+    const query = typeof req.query.q === "string" ? req.query.q : undefined;
+    const organizations = await orgService.listOrgs(query);
+    sendSuccess(res, { organizations });
+  } catch (error) {
+    sendError(error, res, "list");
+  }
+}
+
 // @route POST /api/orgs
 // @desc  Create organization (authenticated, no tenant required)
 export async function create(req: Request, res: Response): Promise<void> {
