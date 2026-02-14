@@ -7,6 +7,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { queryClient } from "@/lib/query-client";
 import { theme } from "@/theme";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { AppSnackbarHost } from "@/components/AppSnackbarHost";
 import { router } from "@/router";
 import "./index.css";
 
@@ -18,6 +19,7 @@ createRoot(document.getElementById("root")!).render(
         <ErrorBoundary>
           <RouterProvider router={router} />
         </ErrorBoundary>
+        <AppSnackbarHost />
       </ThemeProvider>
     </QueryClientProvider>
   </StrictMode>,

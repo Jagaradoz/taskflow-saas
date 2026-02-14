@@ -6,27 +6,43 @@ import {
   Mail,
   Inbox,
   LogOut,
+  X,
 } from 'lucide-react';
-import { getAuthState, mockLogout } from '../../mock/auth';
+import { useAuthQuery, useLogoutMutation } from '@/features/auth/hooks/use-auth';
 
-const NAV_ITEMS = [
-  { to: '/', label: 'TASKS', icon: LayoutDashboard },
-  { to: '/members', label: 'MEMBERS', icon: Users },
-  { to: '/settings', label: 'SETTINGS', icon: Settings },
-  { to: '/invites', label: 'INVITES', icon: Mail },
-  { to: '/requests', label: 'REQUESTS', icon: Inbox },
-] as const;
+interface SidebarProps {
+  currentOrgId: string;
+  mobile?: boolean;
+  onClose?: () => void;
+  onNavigate?: () => void;
+}
 
-export const Sidebar: React.FC = () => {
+export const Sidebar: React.FC<SidebarProps> = ({
+  currentOrgId,
+  mobile = false,
+  onClose,
+  onNavigate,
+}) => {
   const navigate = useNavigate();
-  const auth = getAuthState();
+  const { data } = useAuthQuery();
+  const logoutMutation = useLogoutMutation();
+  const auth = data?.user;
+  const dashboardBasePath = `/app/${currentOrgId}`;
+  const navItems = [
+    { to: dashboardBasePath, label: 'TASKS', icon: LayoutDashboard },
+    { to: `${dashboardBasePath}/member`, label: 'MEMBERS', icon: Users },
+    { to: `${dashboardBasePath}/settings`, label: 'SETTINGS', icon: Settings },
+    { to: `${dashboardBasePath}/invites`, label: 'INVITES', icon: Mail },
+    { to: `${dashboardBasePath}/requests`, label: 'REQUESTS', icon: Inbox },
+  ] as const;
 
-  const handleLogout = (): void => {
-    mockLogout();
-    navigate('/login');
+  const handleLogout = async (): Promise<void> => {
+    await logoutMutation.mutateAsync();
+    onNavigate?.();
+    navigate('/');
   };
 
-  const initials = auth?.user.name
+  const initials = auth?.name
     .split(' ')
     .map((n) => n[0])
     .join('')
@@ -34,7 +50,7 @@ export const Sidebar: React.FC = () => {
     .slice(0, 2) ?? '';
 
   return (
-    <aside className="flex h-screen w-60 shrink-0 flex-col justify-between border-r border-border bg-bg-sidebar pt-6">
+    <aside className="flex h-full w-60 shrink-0 flex-col justify-between border-r border-border bg-bg-sidebar pt-6">
       {/* Top */}
       <div className="flex flex-col">
         {/* Logo */}
@@ -45,15 +61,25 @@ export const Sidebar: React.FC = () => {
           <span className="font-mono text-sm font-semibold tracking-[1px] text-white">
             TASKFLOW
           </span>
+          {mobile && onClose && (
+            <button
+              onClick={onClose}
+              className="ml-auto text-gray-500 hover:text-white"
+              title="Close navigation"
+            >
+              <X size={16} />
+            </button>
+          )}
         </div>
 
         {/* Navigation */}
         <nav className="flex flex-col gap-0.5">
-          {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
+          {navItems.map(({ to, label, icon: Icon }) => (
             <NavLink
               key={to}
               to={to}
-              end={to === '/'}
+              end={to === dashboardBasePath}
+              onClick={onNavigate}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-5 py-3 font-mono text-xs tracking-wide transition-colors ${
                   isActive
@@ -101,7 +127,7 @@ export const Sidebar: React.FC = () => {
           </div>
           <div className="flex min-w-0 flex-col gap-0.5">
             <span className="truncate font-mono text-[13px] font-medium text-white">
-              {auth?.user.name}
+              {auth?.name ?? 'User'}
             </span>
             <span className="font-mono text-[11px] font-medium text-green-primary">
               ONLINE

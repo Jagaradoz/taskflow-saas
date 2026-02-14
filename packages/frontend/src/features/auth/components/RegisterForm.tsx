@@ -2,7 +2,8 @@ import { useState, useCallback } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Button, TextField, Alert } from "@mui/material";
-import { mockRegister } from '../../../mock/auth';
+import { ApiError } from '@/types/api';
+import { useRegisterMutation } from '../hooks/use-auth';
 
 export function RegisterForm(): JSX.Element {
   const navigate = useNavigate();
@@ -10,27 +11,27 @@ export function RegisterForm(): JSX.Element {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const registerMutation = useRegisterMutation();
 
   const handleSubmit = useCallback(
-    (e: FormEvent) => {
+    async (e: FormEvent) => {
       e.preventDefault();
       setError(null);
 
-      if (password.length < 6) {
-        setError("Password must be at least 6 characters");
+      if (password.length < 8) {
+        setError("Password must be at least 8 characters");
         return;
       }
 
-      setLoading(true);
-
-      // Simulate async delay
-      setTimeout(() => {
-        mockRegister(name, email, password);
-        navigate("/", { replace: true });
-      }, 300);
+      try {
+        await registerMutation.mutateAsync({ name, email, password });
+        navigate('/app', { replace: true });
+      } catch (err) {
+        const message = err instanceof ApiError ? err.message : 'Failed to register';
+        setError(message);
+      }
     },
-    [name, email, password, navigate],
+    [name, email, password, navigate, registerMutation],
   );
 
   return (
@@ -84,10 +85,10 @@ export function RegisterForm(): JSX.Element {
         variant="contained"
         color="primary"
         fullWidth
-        disabled={loading}
+        disabled={registerMutation.isPending}
         sx={{ height: 48, fontSize: 13, letterSpacing: 1 }}
       >
-        {loading ? "CREATING ACCOUNT..." : "REGISTER"}
+        {registerMutation.isPending ? "CREATING ACCOUNT..." : "REGISTER"}
       </Button>
     </Box>
   );

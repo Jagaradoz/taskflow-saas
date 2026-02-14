@@ -107,6 +107,26 @@ export const orgService = {
     return org;
   },
 
+  async deleteOrg(orgId: string, userId: string) {
+    const org = await orgRepository.findById(orgId);
+    if (!org) {
+      throw new NotFoundError("Organization not found");
+    }
+
+    // Get all member userIds before deletion (for cache invalidation)
+    const members = await memberRepository.findByOrgId(orgId);
+    const memberUserIds = members.map((m) => m.userId);
+
+    await withTransaction(async (client) => {
+      await orgRepository.delete(orgId, client);
+    });
+
+    // Invalidate caches for all affected users
+    await Promise.all(
+      memberUserIds.map((uid) => cacheService.del(cacheKeys.user(uid))),
+    );
+  },
+
   async switchOrg(userId: string, orgId: string) {
     const org = await orgRepository.findById(orgId);
     if (!org) {

@@ -23,32 +23,36 @@ export const TaskTable: React.FC<TaskTableProps> = ({
   onDelete,
 }) => (
   <div className="border border-border bg-bg-card">
-    {/* Header */}
-    <div className="flex items-center border-b border-border px-4 py-3">
-      {COLUMNS.map((col) => (
-        <div key={col.label} className={`shrink-0 ${col.width}`}>
-          <span className="font-mono text-[11px] font-bold uppercase tracking-wide text-gray-500">
-            {col.label}
-          </span>
+    <div className="overflow-x-auto">
+      <div className="min-w-[760px]">
+        {/* Header */}
+        <div className="flex items-center border-b border-border px-4 py-3">
+          {COLUMNS.map((col) => (
+            <div key={col.label} className={`shrink-0 ${col.width}`}>
+              <span className="font-mono text-[11px] font-bold uppercase tracking-wide text-gray-500">
+                {col.label}
+              </span>
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
 
-    {/* Rows */}
-    {tasks.length === 0 ? (
-      <div className="px-4 py-8 text-center">
-        <span className="font-mono text-xs text-gray-500">No tasks yet</span>
+        {/* Rows */}
+        {tasks.length === 0 ? (
+          <div className="px-4 py-8 text-center">
+            <span className="font-mono text-xs text-gray-500">No tasks yet</span>
+          </div>
+        ) : (
+          tasks.map((task) => (
+            <TaskRow
+              key={task.id}
+              task={task}
+              onToggleDone={onToggleDone}
+              onTogglePin={onTogglePin}
+              onDelete={onDelete}
+            />
+          ))
+        )}
       </div>
-    ) : (
-      tasks.map((task) => (
-        <TaskRow
-          key={task.id}
-          task={task}
-          onToggleDone={onToggleDone}
-          onTogglePin={onTogglePin}
-          onDelete={onDelete}
-        />
-      ))
-    )}
+    </div>
   </div>
 );

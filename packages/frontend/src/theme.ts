@@ -29,6 +29,15 @@ const fontHeading = '"Space Grotesk", "Roboto", "Helvetica", sans-serif';
 const fontMono = '"JetBrains Mono", "Fira Code", monospace';
 
 export const theme = createTheme({
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 390,
+      md: 768,
+      lg: 1024,
+      xl: 1440,
+    },
+  },
   palette: {
     mode: 'dark',
     primary: {

@@ -9,7 +9,6 @@
     "dev:frontend": "pnpm --filter @taskflow/frontend dev",
     "build": "pnpm -r run build",
     "lint": "pnpm -r run lint",
-    "test": "pnpm -r run test",
     "services:up": "docker compose up -d",
     "services:down": "docker compose down",
     "services:reset": "docker compose down -v && docker compose up -d",

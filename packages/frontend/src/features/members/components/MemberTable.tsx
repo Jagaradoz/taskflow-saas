@@ -20,25 +20,29 @@ export const MemberTable: React.FC<MemberTableProps> = ({
   onRemove,
 }) => (
   <div className="border border-border bg-bg-card">
-    {/* Header */}
-    <div className="flex items-center border-b border-border px-4 py-3">
-      {COLUMNS.map((col) => (
-        <div key={col.label} className={`shrink-0 ${col.width}`}>
-          <span className="font-mono text-[11px] font-bold uppercase tracking-wide text-gray-500">
-            {col.label}
-          </span>
+    <div className="overflow-x-auto">
+      <div className="min-w-[680px]">
+        {/* Header */}
+        <div className="flex items-center border-b border-border px-4 py-3">
+          {COLUMNS.map((col) => (
+            <div key={col.label} className={`shrink-0 ${col.width}`}>
+              <span className="font-mono text-[11px] font-bold uppercase tracking-wide text-gray-500">
+                {col.label}
+              </span>
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
 
-    {/* Rows */}
-    {members.map((member) => (
-      <MemberRow
-        key={member.id}
-        member={member}
-        isCurrentUserOwner={isCurrentUserOwner}
-        onRemove={onRemove}
-      />
-    ))}
+        {/* Rows */}
+        {members.map((member) => (
+          <MemberRow
+            key={member.id}
+            member={member}
+            isCurrentUserOwner={isCurrentUserOwner}
+            onRemove={onRemove}
+          />
+        ))}
+      </div>
+    </div>
   </div>
 );

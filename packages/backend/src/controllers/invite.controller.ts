@@ -37,7 +37,7 @@ export async function create(req: Request, res: Response): Promise<void> {
 
     const invite = await inviteService.createInvite(
       orgId,
-      parseResult.data.userId,
+      parseResult.data.email,
       parseResult.data.role,
       invitedBy,
     );

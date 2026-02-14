@@ -93,6 +93,36 @@ export async function update(req: Request, res: Response): Promise<void> {
   }
 }
 
+// @route DELETE /api/orgs/:id
+// @desc  Delete organization (owner only)
+export async function deleteOrg(req: Request, res: Response): Promise<void> {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      throw new UnauthorizedError("User not found in session");
+    }
+
+    const orgId = req.params.id;
+    if (!orgId) {
+      throw new ValidationError("Organization ID is required");
+    }
+
+    if (orgId !== req.currentOrgId) {
+      throw new ForbiddenError(
+        "Organization ID mismatch. You can only delete your current organization.",
+      );
+    }
+
+    await orgService.deleteOrg(orgId, userId);
+
+    req.session.currentOrgId = undefined;
+
+    sendSuccess(res, { message: "Organization deleted successfully" });
+  } catch (error) {
+    sendError(error, res, "deleteOrg");
+  }
+}
+
 // @route POST /api/orgs/:id/switch
 // @desc  Switch active organization (authenticated)
 export async function switchOrg(req: Request, res: Response): Promise<void> {

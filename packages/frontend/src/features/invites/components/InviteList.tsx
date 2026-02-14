@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { X, Check } from 'lucide-react';
-import type { MembershipRequestWithUser } from '../../../mock/membership-requests';
+import type { MembershipRequestWithUser } from '@/types/membership-request';
 
 interface InviteListProps {
   invites: MembershipRequestWithUser[];
@@ -33,6 +33,7 @@ export const InviteList: React.FC<InviteListProps> = ({
   onDecline,
 }) => {
   const columns = variant === 'org' ? ORG_COLUMNS : MY_COLUMNS;
+  const minTableWidth = variant === 'org' ? 'min-w-[760px]' : 'min-w-[680px]';
 
   if (invites.length === 0) {
     return (
@@ -46,28 +47,32 @@ export const InviteList: React.FC<InviteListProps> = ({
 
   return (
     <div className="border border-border bg-bg-card">
-      {/* Header */}
-      <div className="flex items-center border-b border-border px-4 py-3">
-        {columns.map((col) => (
-          <div key={col.label} className={`shrink-0 ${col.width}`}>
-            <span className="font-mono text-[11px] font-bold uppercase tracking-wide text-gray-500">
-              {col.label}
-            </span>
+      <div className="overflow-x-auto">
+        <div className={minTableWidth}>
+          {/* Header */}
+          <div className="flex items-center border-b border-border px-4 py-3">
+            {columns.map((col) => (
+              <div key={col.label} className={`shrink-0 ${col.width}`}>
+                <span className="font-mono text-[11px] font-bold uppercase tracking-wide text-gray-500">
+                  {col.label}
+                </span>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      {/* Rows */}
-      {invites.map((invite) => (
-        <InviteRow
-          key={invite.id}
-          invite={invite}
-          variant={variant}
-          onRevoke={onRevoke}
-          onAccept={onAccept}
-          onDecline={onDecline}
-        />
-      ))}
+          {/* Rows */}
+          {invites.map((invite) => (
+            <InviteRow
+              key={invite.id}
+              invite={invite}
+              variant={variant}
+              onRevoke={onRevoke}
+              onAccept={onAccept}
+              onDecline={onDecline}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

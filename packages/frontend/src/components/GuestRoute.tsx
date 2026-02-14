@@ -1,10 +1,12 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { getAuthState } from '../mock/auth';
+import { useAuthQuery } from '@/features/auth/hooks/use-auth';
 
 export function GuestRoute(): JSX.Element {
-  const auth = getAuthState();
-  if (auth?.user) {
-    return <Navigate to="/" replace />;
+  const { data } = useAuthQuery();
+
+  if (data?.user) {
+    const firstOrg = data.user.memberships[0];
+    return <Navigate to={firstOrg ? `/app/${firstOrg.orgId}` : "/no-org"} replace />;
   }
 
   return <Outlet />;

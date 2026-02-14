@@ -17,6 +17,14 @@ router.patch(
   orgController.update,
 );
 
+router.delete(
+  "/:id",
+  authenticate,
+  requireTenant,
+  authorize("owner"),
+  orgController.deleteOrg,
+);
+
 router.post("/:id/switch", authenticate, orgController.switchOrg);
 
 export { router as orgRoutes };

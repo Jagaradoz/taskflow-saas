@@ -14,15 +14,17 @@ import type { MembershipRequestStatus } from "../types/membership-request.js";
 export const inviteService = {
   async createInvite(
     orgId: string,
-    targetUserId: string,
+    email: string,
     role: "member",
     invitedBy: string,
   ) {
-    // Check if target user exists
-    const targetUser = await userRepository.findById(targetUserId);
+    // Resolve user by email
+    const targetUser = await userRepository.findByEmail(email);
     if (!targetUser) {
-      throw new NotFoundError("User not found");
+      throw new NotFoundError("No user found with this email");
     }
+
+    const targetUserId = targetUser.id;
 
     // Check if user is already a member
     const existingMembership = await memberRepository.findByUserAndOrg(
