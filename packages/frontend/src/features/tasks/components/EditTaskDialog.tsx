@@ -1,30 +1,41 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
+import type { Task } from '../../../types/task';
 
-interface CreateTaskDialogProps {
+interface EditTaskDialogProps {
   open: boolean;
   onClose: () => void;
-  onCreate: (title: string, description?: string) => void;
+  onSave: (updates: { title: string; description?: string }) => void;
+  task: Task | null;
 }
 
-export const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
+export const EditTaskDialog: React.FC<EditTaskDialogProps> = ({
   open,
   onClose,
-  onCreate,
+  onSave,
+  task,
 }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+
+  useEffect(() => {
+    if (task) {
+      setTitle(task.title);
+      setDescription(task.description ?? '');
+    }
+  }, [task]);
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
       if (!title.trim()) return;
-      onCreate(title.trim(), description.trim() || undefined);
-      setTitle('');
-      setDescription('');
+      onSave({
+        title: title.trim(),
+        description: description.trim() || undefined,
+      });
       onClose();
     },
-    [title, description, onCreate, onClose],
+    [title, description, onSave, onClose],
   );
 
   return (
@@ -52,7 +63,7 @@ export const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
           pb: 1,
         }}
       >
-        NEW TASK
+        EDIT TASK
       </DialogTitle>
       <DialogContent>
         <form onSubmit={handleSubmit} className="flex flex-col gap-5 pt-2">
@@ -93,7 +104,7 @@ export const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
               type="submit"
               className="flex h-10 items-center bg-green-primary px-5 font-mono text-[11px] font-bold uppercase tracking-wide text-black-on-accent hover:brightness-90"
             >
-              CREATE TASK
+              SAVE CHANGES
             </button>
           </div>
         </form>

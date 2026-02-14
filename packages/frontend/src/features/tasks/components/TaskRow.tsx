@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { CircleCheck, Circle, Trash2, Pin, PinOff } from 'lucide-react';
+import { CircleCheck, Circle, Trash2, Pin, PinOff, Pencil } from 'lucide-react';
 import type { Task } from '../../../types/task';
 
 interface TaskRowProps {
@@ -7,6 +7,7 @@ interface TaskRowProps {
   onToggleDone: (taskId: string, isDone: boolean) => void;
   onTogglePin: (taskId: string, isPinned: boolean) => void;
   onDelete: (taskId: string) => void;
+  onEdit: (task: Task) => void;
 }
 
 export const TaskRow: React.FC<TaskRowProps> = ({
@@ -14,6 +15,7 @@ export const TaskRow: React.FC<TaskRowProps> = ({
   onToggleDone,
   onTogglePin,
   onDelete,
+  onEdit,
 }) => {
   const handleToggleDone = useCallback(() => {
     onToggleDone(task.id, !task.isDone);
@@ -26,6 +28,10 @@ export const TaskRow: React.FC<TaskRowProps> = ({
   const handleDelete = useCallback(() => {
     onDelete(task.id);
   }, [task.id, onDelete]);
+
+  const handleEdit = useCallback(() => {
+    onEdit(task);
+  }, [task, onEdit]);
 
   return (
     <div className="flex items-center border-b border-border px-4 py-4 last:border-b-0">
@@ -49,6 +55,11 @@ export const TaskRow: React.FC<TaskRowProps> = ({
         >
           {task.title}
         </span>
+        {task.description && (
+          <p className="line-clamp-1 font-mono text-[11px] text-gray-500">
+            {task.description}
+          </p>
+        )}
       </div>
 
       {/* Creator */}
@@ -69,6 +80,13 @@ export const TaskRow: React.FC<TaskRowProps> = ({
 
       {/* Actions */}
       <div className="flex w-[80px] shrink-0 gap-2">
+        <button
+          onClick={handleEdit}
+          className="text-gray-400 hover:text-green-primary"
+          title="Edit"
+        >
+          <Pencil size={14} />
+        </button>
         <button
           onClick={handleTogglePin}
           className="text-gray-400 hover:text-green-primary"
