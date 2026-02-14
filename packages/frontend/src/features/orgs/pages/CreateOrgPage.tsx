@@ -13,6 +13,10 @@ function generateSlug(name: string): string {
     .slice(0, 50);
 }
 
+function toTitleCase(str: string): string {
+  return str.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 const CreateOrgPage: React.FC = () => {
   const navigate = useNavigate();
   const { data: auth } = useAuthQuery();
@@ -35,8 +39,8 @@ const CreateOrgPage: React.FC = () => {
       e.preventDefault();
       setError(null);
 
-      const trimmedName = name.trim();
-      if (!trimmedName) {
+      const titleCasedName = toTitleCase(name.trim());
+      if (!titleCasedName) {
         setError('Organization name is required.');
         return;
       }
@@ -46,10 +50,11 @@ const CreateOrgPage: React.FC = () => {
         return;
       }
 
+      setName(titleCasedName);
       setSaving(true);
       try {
         const result = await createOrgMutation.mutateAsync({
-          name: trimmedName,
+          name: titleCasedName,
           description: description.trim() || undefined,
         });
         navigate(`/app/${result.organization.id}`, { replace: true });
@@ -99,6 +104,7 @@ const CreateOrgPage: React.FC = () => {
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
+              onBlur={() => setName((prev) => toTitleCase(prev.trim()))}
               placeholder="Acme Engineering"
               autoFocus
               className="h-11 w-full border border-border bg-bg-elevated px-3.5 font-mono text-[13px] font-medium text-white placeholder:text-gray-400 focus:border-green-primary focus:outline-none"

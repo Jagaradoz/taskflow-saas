@@ -6,6 +6,7 @@ interface TaskTableProps {
   onToggleDone: (taskId: string, isDone: boolean) => void;
   onTogglePin: (taskId: string, isPinned: boolean) => void;
   onDelete: (taskId: string) => void;
+  onEdit: (task: Task) => void;
 }
 
 const COLUMNS = [
@@ -21,6 +22,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({
   onToggleDone,
   onTogglePin,
   onDelete,
+  onEdit,
 }) => (
   <div className="border border-border bg-bg-card">
     <div className="overflow-x-auto">
@@ -49,6 +51,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({
               onToggleDone={onToggleDone}
               onTogglePin={onTogglePin}
               onDelete={onDelete}
+              onEdit={onEdit}
             />
           ))
         )}

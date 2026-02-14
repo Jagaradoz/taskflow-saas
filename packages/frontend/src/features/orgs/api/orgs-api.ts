@@ -12,6 +12,11 @@ interface UpdateOrganizationInput {
 }
 
 export const orgsApi = {
+  list: (query?: string) => {
+    const params = query ? `?q=${encodeURIComponent(query)}` : '';
+    return apiClient<{ organizations: Organization[] }>(`/api/orgs${params}`);
+  },
+
   create: (payload: CreateOrganizationInput) =>
     apiClient<{ organization: Organization }>('/api/orgs', {
       method: 'POST',

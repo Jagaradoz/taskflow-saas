@@ -1,9 +1,19 @@
-import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { orgsApi } from '../api/orgs-api';
 import { authQueryKey } from '@/features/auth/hooks/use-auth';
 
 export function orgQueryKey(orgId: string) {
   return ['orgs', orgId] as const;
+}
+
+export function useListOrganizationsQuery(query?: string) {
+  return useQuery({
+    queryKey: ['orgs', 'list', query ?? ''],
+    queryFn: async () => {
+      const data = await orgsApi.list(query);
+      return data.organizations;
+    },
+  });
 }
 
 export function useOrganizationQuery(orgId: string) {

@@ -6,6 +6,7 @@ import { authorize } from "../middleware/authorize.middleware.js";
 
 const router = Router();
 
+router.get("/", authenticate, orgController.list);
 router.post("/", authenticate, orgController.create);
 router.get("/:id", authenticate, orgController.getById);
 

@@ -33,6 +33,10 @@ function generateSlug(name: string): string {
 }
 
 export const orgService = {
+  async listOrgs(query?: string) {
+    return orgRepository.findAll(query);
+  },
+
   async createOrg(userId: string, input: CreateOrgInput) {
     const nameExists = await orgRepository.nameExists(input.name);
     if (nameExists) {

@@ -22,7 +22,7 @@ const MY_COLUMNS = [
   { label: 'ORGANIZATION', width: 'flex-1' },
   { label: 'INVITED BY', width: 'flex-1' },
   { label: 'STATUS', width: 'w-[100px]' },
-  { label: 'ACTIONS', width: 'w-[140px]' },
+  { label: 'ACTIONS', width: 'w-[180px]' },
 ] as const;
 
 export const InviteList: React.FC<InviteListProps> = ({
@@ -33,7 +33,8 @@ export const InviteList: React.FC<InviteListProps> = ({
   onDecline,
 }) => {
   const columns = variant === 'org' ? ORG_COLUMNS : MY_COLUMNS;
-  const minTableWidth = variant === 'org' ? 'min-w-[760px]' : 'min-w-[680px]';
+  const minTableWidth =
+    variant === 'org' ? 'min-w-[760px] lg:min-w-0' : 'min-w-[680px] lg:min-w-0';
 
   if (invites.length === 0) {
     return (
@@ -47,8 +48,8 @@ export const InviteList: React.FC<InviteListProps> = ({
 
   return (
     <div className="border border-border bg-bg-card">
-      <div className="overflow-x-auto">
-        <div className={minTableWidth}>
+      <div className="overflow-x-auto lg:overflow-x-visible">
+        <div className={`w-full ${minTableWidth}`}>
           {/* Header */}
           <div className="flex items-center border-b border-border px-4 py-3">
             {columns.map((col) => (
@@ -188,13 +189,13 @@ const InviteRow: React.FC<InviteRowProps> = ({
       </div>
 
       {/* Actions */}
-      <div className="flex w-[140px] shrink-0 gap-2">
+      <div className="flex w-[180px] shrink-0 justify-end gap-2">
         {isPending && (
           <>
             {onDecline && (
               <button
                 onClick={handleDecline}
-                className="flex h-8 items-center gap-1.5 border border-border px-3 font-mono text-[10px] font-bold uppercase tracking-wide text-white hover:border-border-light hover:bg-bg-subtle"
+                className="flex h-8 items-center gap-1.5 border border-border px-3 font-mono text-[10px] font-bold uppercase tracking-wide whitespace-nowrap text-white hover:border-border-light hover:bg-bg-subtle"
               >
                 <X size={12} />
                 DECLINE
@@ -203,7 +204,7 @@ const InviteRow: React.FC<InviteRowProps> = ({
             {onAccept && (
               <button
                 onClick={handleAccept}
-                className="flex h-8 items-center gap-1.5 bg-green-primary px-3 font-mono text-[10px] font-bold uppercase tracking-wide text-black-on-accent hover:brightness-90"
+                className="flex h-8 items-center gap-1.5 bg-green-primary px-3 font-mono text-[10px] font-bold uppercase tracking-wide whitespace-nowrap text-black-on-accent hover:brightness-90"
               >
                 <Check size={12} />
                 ACCEPT

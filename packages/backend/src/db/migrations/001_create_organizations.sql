@@ -12,6 +12,9 @@ CREATE TABLE organizations (
 -- Indexes: slug index for faster lookups
 CREATE INDEX idx_organizations_slug ON organizations(slug);
 
+-- Indexes: case-insensitive unique constraint on name
+CREATE UNIQUE INDEX idx_organizations_name_unique ON organizations(LOWER(name));
+
 
 -- Functions: update updated_at column after manipulation
 CREATE OR REPLACE FUNCTION update_updated_at_column()

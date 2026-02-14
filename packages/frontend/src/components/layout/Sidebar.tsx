@@ -5,6 +5,7 @@ import {
   Settings,
   Mail,
   Inbox,
+  UserPlus,
   LogOut,
   X,
 } from 'lucide-react';
@@ -28,12 +29,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const logoutMutation = useLogoutMutation();
   const auth = data?.user;
   const dashboardBasePath = `/app/${currentOrgId}`;
-  const navItems = [
+  const organizationNavItems = [
     { to: dashboardBasePath, label: 'TASKS', icon: LayoutDashboard },
     { to: `${dashboardBasePath}/member`, label: 'MEMBERS', icon: Users },
     { to: `${dashboardBasePath}/settings`, label: 'SETTINGS', icon: Settings },
     { to: `${dashboardBasePath}/invites`, label: 'INVITES', icon: Mail },
     { to: `${dashboardBasePath}/requests`, label: 'REQUESTS', icon: Inbox },
+  ] as const;
+  const userNavItems = [
+    { to: `${dashboardBasePath}/me/invites`, label: 'MY INVITES', icon: UserPlus },
   ] as const;
 
   const handleLogout = async (): Promise<void> => {
@@ -74,17 +78,41 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Navigation */}
         <nav className="flex flex-col gap-0.5">
-          {navItems.map(({ to, label, icon: Icon }) => (
+          <span className="px-2 pb-1 font-mono text-[10px] font-medium tracking-[1px] text-gray-500">
+            ORGANIZATIONS
+          </span>
+          {organizationNavItems.map(({ to, label, icon: Icon }) => (
             <NavLink
               key={to}
               to={to}
               end={to === dashboardBasePath}
               onClick={onNavigate}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-5 py-3 font-mono text-xs tracking-wide transition-colors ${
-                  isActive
-                    ? 'border-l-2 border-green-primary bg-green-tint-10 font-semibold text-white'
-                    : 'border-l-2 border-transparent font-medium text-gray-500 hover:bg-green-tint-10/50 hover:text-white'
+                `flex items-center gap-3 px-5 py-3 font-mono text-xs tracking-wide transition-colors ${isActive
+                  ? 'border-l-2 border-green-primary bg-green-tint-10 font-semibold text-white'
+                  : 'border-l-2 border-transparent font-medium text-gray-500 hover:bg-green-tint-10/50 hover:text-white'
+                }`
+              }
+            >
+              <Icon size={16} />
+              {label}
+            </NavLink>
+          ))}
+
+          <div className="my-2 h-px w-full bg-border" />
+
+          <span className="px-2 pb-1 font-mono text-[10px] font-medium tracking-[1px] text-gray-500">
+            USERS
+          </span>
+          {userNavItems.map(({ to, label, icon: Icon }) => (
+            <NavLink
+              key={to}
+              to={to}
+              onClick={onNavigate}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-5 py-3 font-mono text-xs tracking-wide transition-colors ${isActive
+                  ? 'border-l-2 border-green-primary bg-green-tint-10 font-semibold text-white'
+                  : 'border-l-2 border-transparent font-medium text-gray-500 hover:bg-green-tint-10/50 hover:text-white'
                 }`
               }
             >
@@ -97,27 +125,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Bottom */}
       <div className="flex flex-col">
-        {/* System Status */}
-        <div className="mx-0 flex flex-col gap-2.5 border-y border-r border-border bg-bg-card p-5">
-          <span className="font-mono text-[11px] font-medium uppercase tracking-[1px] text-gray-500">
-            SYSTEM STATUS
-          </span>
-          {[
-            ['API', '[OK]'],
-            ['DATABASE', '[OK]'],
-            ['REDIS', '[OK]'],
-          ].map(([label, value]) => (
-            <div key={label} className="flex items-center justify-between">
-              <span className="font-mono text-[11px] font-medium text-gray-500">
-                {label}
-              </span>
-              <span className="font-mono text-[11px] font-semibold text-green-primary">
-                {value}
-              </span>
-            </div>
-          ))}
-        </div>
-
         {/* User Section */}
         <div className="flex items-center gap-3 border-t border-border px-5 py-4">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center border border-border-light bg-bg-subtle">

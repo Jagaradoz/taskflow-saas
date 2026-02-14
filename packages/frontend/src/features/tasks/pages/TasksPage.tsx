@@ -4,6 +4,8 @@ import { useDashboardContext } from '../../../hooks/useDashboardContext';
 import { TaskStatsCards } from '../components/TaskStatsCards';
 import { TaskTable } from '../components/TaskTable';
 import { CreateTaskDialog } from '../components/CreateTaskDialog';
+import { EditTaskDialog } from '../components/EditTaskDialog';
+import type { Task } from '../../../types/task';
 import { useTasksQuery, useCreateTaskMutation, useUpdateTaskMutation, useDeleteTaskMutation } from '../hooks/use-tasks';
 import { useMembersQuery } from '@/features/members/hooks/use-members';
 
@@ -15,10 +17,11 @@ const TasksPage: React.FC = () => {
   const updateTaskMutation = useUpdateTaskMutation(currentOrgId);
   const deleteTaskMutation = useDeleteTaskMutation(currentOrgId);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   const handleCreate = useCallback(
-    async (title: string) => {
-      await createTaskMutation.mutateAsync({ title });
+    async (title: string, description?: string) => {
+      await createTaskMutation.mutateAsync({ title, description });
     },
     [createTaskMutation],
   );
@@ -42,6 +45,19 @@ const TasksPage: React.FC = () => {
       await deleteTaskMutation.mutateAsync(taskId);
     },
     [deleteTaskMutation],
+  );
+
+  const handleEdit = useCallback((task: Task) => {
+    setEditingTask(task);
+  }, []);
+
+  const handleSaveEdit = useCallback(
+    async (updates: { title: string; description?: string }) => {
+      if (!editingTask) return;
+      await updateTaskMutation.mutateAsync({ taskId: editingTask.id, updates });
+      setEditingTask(null);
+    },
+    [editingTask, updateTaskMutation],
   );
 
   return (
@@ -76,6 +92,7 @@ const TasksPage: React.FC = () => {
         onToggleDone={handleToggleDone}
         onTogglePin={handleTogglePin}
         onDelete={handleDelete}
+        onEdit={handleEdit}
       />
 
       {/* Create Dialog */}
@@ -83,6 +100,14 @@ const TasksPage: React.FC = () => {
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
         onCreate={handleCreate}
+      />
+
+      {/* Edit Dialog */}
+      <EditTaskDialog
+        open={editingTask !== null}
+        onClose={() => setEditingTask(null)}
+        onSave={handleSaveEdit}
+        task={editingTask}
       />
     </div>
   );
