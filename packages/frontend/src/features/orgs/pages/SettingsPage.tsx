@@ -18,6 +18,10 @@ function generateSlug(name: string): string {
     .slice(0, 50);
 }
 
+function toTitleCase(str: string): string {
+  return str.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 const SettingsPage: React.FC = () => {
   const { currentOrgId } = useDashboardContext();
   const { data: auth } = useAuthQuery();
@@ -43,8 +47,10 @@ const SettingsPage: React.FC = () => {
 
   const handleSave = useCallback(() => {
     if (!org || !isOwner) return;
+    const titleCasedName = toTitleCase(name.trim());
+    setName(titleCasedName);
     updateOrgMutation
-      .mutateAsync({ name: name.trim(), description: description.trim() || undefined })
+      .mutateAsync({ name: titleCasedName, description: description.trim() || undefined })
       .then(() => {
         setSaved(true);
         setTimeout(() => setSaved(false), 2000);
@@ -97,6 +103,7 @@ const SettingsPage: React.FC = () => {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              onBlur={() => setName((prev) => toTitleCase(prev.trim()))}
               disabled={!isOwner}
               className="h-11 w-full border border-border bg-bg-elevated px-3.5 font-mono text-[13px] font-medium text-white placeholder:text-gray-400 focus:border-green-primary focus:outline-none disabled:cursor-not-allowed disabled:text-gray-500 disabled:opacity-60"
             />
